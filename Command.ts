@@ -1,4 +1,3 @@
-import Ajv from "ajv";
 import { Aggregate } from "./Aggregate";
 
 class Command {
@@ -20,19 +19,19 @@ class Command {
         this.payload = payload;
     }
 
-    validate(): any | null {
-        console.log('validate');
-        console.log(this.schema);
-        const ajv = new Ajv();
-        const validate = ajv.compile(this.schema);
-        const valid = validate(this.payload);
-        if (!valid) {
-            console.log(validate.errors);
-            return validate.errors;
-        }
+    // validate(): any | null {
+    //     console.log('validate');
+    //     console.log(this.schema);
+    //     const ajv = new Ajv();
+    //     const validate = ajv.compile(this.schema);
+    //     const valid = validate(this.payload);
+    //     if (!valid) {
+    //         console.log(validate.errors);
+    //         return validate.errors;
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 }
 
 export { Command };

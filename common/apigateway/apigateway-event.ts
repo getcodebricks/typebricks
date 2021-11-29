@@ -8,4 +8,5 @@ export interface ApiGatewayEvent {
     headers: Record<string, string>;
     requestContext: ApiGatewayRequestContext;
     pathParameters?: Record<string, string>;
+    queryStringParameters?: any
 }

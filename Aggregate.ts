@@ -48,7 +48,7 @@ class Aggregate {
     //     return this.version;
     // }
 
-    loadFromHistory(history: any[]): void {
+    async loadFromHistory(history: any[]): Promise<void> {
         console.log('loadFromHistory');
         // console.log(history[0]);
         // console.log(typeof history[0]);
