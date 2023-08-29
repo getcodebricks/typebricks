@@ -1,7 +1,7 @@
 {
     "name": "dddtsframework",
     "private": true,
-    "version": "0.0.11",
+    "version": "0.0.22",
     "description": "",
     "main": "index.js",
     "types": "index.d.ts",
@@ -14,7 +14,7 @@
         "postbuild": "npm run distPackage",
         "distPackage": "cp package.json ./dist/ && npx json -I -f ./dist/package.json -e 'this.scripts={}' -e 'this.private=false' ",
         "testAndMigrate": "npm run migration && mocha -r ts-node/register tests/**/*.test.ts -g 'bank account events'",
-        "test": "mocha --full-trace -r ts-node/register tests/**/*.test.ts",
+        "test": "mocha --full-trace -r ts-node/register tests/domain/**/*.test.ts",
         "testExample": "export $(cat .env | xargs) && mocha -r ts-node/register examples/**/**/**/BankAccountOverviewProjection.test.ts",
         "coverage": "nyc -r text -e .ts -x \"tests/*.test.ts\" npm run test",
         "migration": "ts-node ./node_modules/typeorm/cli.js migration:run -d ./src/infrastructure/app-data-source.ts"
@@ -37,8 +37,10 @@
         "@aws-sdk/client-sns": "^3.82.0",
         "@types/aws-lambda": "^8.10.97",
         "aws-sdk": "^2.1128.0",
+        "is-what": "^4.1.15",
         "pg": "^8.7.3",
         "reflect-metadata": "^0.1.13",
+        "shallow-equal": "^3.1.0",
         "shallow-equal-object": "^1.1.1",
         "typeorm": "^0.3.6",
         "uuid": "^8.3.2"

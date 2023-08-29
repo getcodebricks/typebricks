@@ -1,5 +1,6 @@
 
 import { shallowEqual } from "shallow-equal-object";
+import { shallowEqualArrays } from "shallow-equal";
 
 export interface ValueObjectProps {
     [index: string]: any;
@@ -16,19 +17,25 @@ export abstract class ValueObject<T extends ValueObjectProps> {
         return this.props;
     }
 
-    public equals (vo?: ValueObject<T>) : boolean {
+    public equals (vo?: ValueObject<T>): boolean {
         if (vo === null || vo === undefined) {
             return false;
         }
-        if (vo.props === undefined) {
+        if (vo.props === null || vo.props === undefined) {
             return false;
         }
         return shallowEqual(this.props, vo.props, {debug: undefined, customEqual: customEqual});
     }
 }
 
-function customEqual(x: any, y: any) {
-    if ((typeof x) === 'object') {
+function customEqual(x: any, y: any): boolean {
+    if (Array.isArray(x) || Array.isArray(y)) {
+        if (x.length !== y.length) {
+            return false;
+        }
+        const e =  shallowEqualArrays(x, y);
+        return shallowEqualArrays(x, y);
+    } else if ((typeof x) === 'object') {
         const keysX = Object.keys(x.props);
         const keysY = Object.keys(y.props);
         if (keysX.length != keysY.length) {
@@ -39,9 +46,7 @@ function customEqual(x: any, y: any) {
             if (!(key in y.props)) {
                 return false;
             }
-            if (!shallowEqual(x.props[key].props, y.props[key].props, {debug: undefined, customEqual: customEqual})) {
-                return false;
-            }
+            return shallowEqual(x.props[key].props, y.props[key].props, {debug: undefined, customEqual: customEqual});
         }
         return true;
     }

@@ -6,6 +6,7 @@ import { Status, StatusProps, StatusValues } from '../../examples/bank/account/s
 import { Email, EmailProps } from '../../examples/bank/account/shared/valueObjects/Email';
 import { Firstname, FirstnameProps } from '../../examples/bank/account/shared/valueObjects/Firstname';
 import { BankAccountId, BankAccountIdProps } from '../../examples/bank/account/shared/valueObjects/BankAccountId';
+import { BankAccountIdList, BankAccountIdListProps } from '../../examples/bank/account/shared/valueObjects/BankAccountIdList';
 import { ValidationError } from "../../src/domain/ValidationError";
 
 describe('valueObject', function() {
@@ -21,6 +22,10 @@ describe('valueObject', function() {
     };
     const emailPropsInvalid: EmailProps = {
         value: 'name.com@provider'
+    };
+    
+    const bankAccountIdValid: BankAccountIdProps = {
+        value: '4ba48b37-e12d-4571-a5cc-0f6686ac8246'
     };
 
     it('balance valid', function() {
@@ -115,5 +120,15 @@ describe('valueObject', function() {
         expect(
             () => new BankAccountId({value: uuid})
         ).to.throw(ValidationError, 'BankAccountId is not a valid uuid');
+    });
+
+    it('valid bank account id list', function() {
+        const uuid1: string = '6045db68-7e73-4f80-9c85-904dbd0a2ebe';
+        const uuid2: string = '358aab5f-c7ba-4f02-8024-9afbff46d317';
+        const uuid3: string = 'd1ab5277-e925-42c8-a6a3-2a93c5ede5ea';
+        const bankAccountIdListValid = new BankAccountIdList({value: [uuid1, uuid2]});
+        expect(bankAccountIdListValid.equals(new BankAccountIdList({value: [uuid1, uuid2]}))).to.be.true;
+        expect(bankAccountIdListValid.equals(new BankAccountIdList({value: [uuid1]}))).to.be.false;
+        expect(bankAccountIdListValid.equals(new BankAccountIdList({value: [uuid1, uuid3]}))).to.be.false;
     });
 });

@@ -31,7 +31,7 @@ export class BankAccountRepository {
     async get(aggregateId: string): Promise<BankAccount | null> {
         await this.initDataSource();
 
-        const rawEvents: Array<StoredEvent> = await AppDataSource.manager.findBy(BankAccountEventStreamEntity, {
+        const rawEvents: BankAccountEventStreamEntity[] = await AppDataSource.manager.findBy(BankAccountEventStreamEntity, {
             aggregateId: aggregateId,
         });
         if (!rawEvents.length) {
@@ -75,7 +75,7 @@ export class BankAccountRepository {
 
     async parseRawEvents(rawEvents: Array<StoredEvent>): Promise<Array<Event<EventPayload>>> {
         const events: Array<Event<EventPayload>> = rawEvents.map((storedEvent: StoredEvent) => {
-            return this.factory.getEvent[`${storedEvent.topic}`](storedEvent);
+            return this.factory.getEvent[`${storedEvent.name}`](storedEvent);
         }).filter(Boolean) as Array<Event<EventPayload>>;
 
         return events;
@@ -101,7 +101,6 @@ export class BankAccountRepository {
                     const bankAccountEvent: BankAccountEventStreamEntity = new BankAccountEventStreamEntity();
                     bankAccountEvent.aggregateId = pendingEvent.aggregateId;
                     bankAccountEvent.aggregateVersion = pendingEvent.aggregateVersion;
-                    bankAccountEvent.topic = pendingEvent.name;
                     bankAccountEvent.payload = JSON.stringify(pendingEvent.payload);
                     bankAccountEvent.occuredAt = pendingEvent.occuredAt;
 

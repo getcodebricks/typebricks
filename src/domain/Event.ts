@@ -26,4 +26,14 @@ export class Event <TPayload extends EventPayload> {
         this.payload = payload;
         this.occuredAt = occuredAt;
     }
+
+    object() {
+        return {
+            aggregateId: this.aggregateId,
+            aggregateVersion: this.aggregateVersion,
+            name: this.name,
+            payload: JSON.stringify(this.payload),
+            occuredAt: this.occuredAt
+        }
+    }
 }

@@ -1,18 +1,18 @@
 import { expect } from 'chai';
 
-import { StoredEvent } from '../src/application/StoredEvent';
-import { BankAccount } from '../examples/bank/account/shared/BankAccount';
-import { BankAccountOpened, BankAccountOpenedPayload  } from '../examples/bank/account/shared/events/BankAccountOpened';
-import { BankAccountTransactionAppended  } from '../examples/bank/account/shared/events/BankAccountTransactionAppended';
-import { Amount } from '../examples/bank/account/shared/valueObjects/Amount';
-import { Customer } from '../examples/bank/account/shared/valueObjects/Customer';
-import { Firstname } from '../examples/bank/account/shared/valueObjects/Firstname';
-import { Email } from '../examples/bank/account/shared/valueObjects/Email';
-import { Status, StatusValues } from '../examples/bank/account/shared/valueObjects/Status';
-import { Balance } from '../examples/bank/account/shared/valueObjects/Balance';
+import { StoredEvent } from '../../src/application/StoredEvent';
+import { BankAccount } from '../../examples/bank/account/shared/BankAccount';
+import { BankAccountOpened, BankAccountOpenedPayload  } from '../../examples/bank/account/shared/events/BankAccountOpened';
+import { BankAccountTransactionAppended  } from '../../examples/bank/account/shared/events/BankAccountTransactionAppended';
+import { Amount } from '../../examples/bank/account/shared/valueObjects/Amount';
+import { Customer } from '../../examples/bank/account/shared/valueObjects/Customer';
+import { Firstname } from '../../examples/bank/account/shared/valueObjects/Firstname';
+import { Email } from '../../examples/bank/account/shared/valueObjects/Email';
+import { Status, StatusValues } from '../../examples/bank/account/shared/valueObjects/Status';
+import { Balance } from '../../examples/bank/account/shared/valueObjects/Balance';
 
-describe('event', function() {
-    it('one event serialization and deserialization', function() {
+describe('event', () => {
+    it('one event serialization and deserialization', () => {
         const bankAccountOpened = new BankAccountOpened(
             'some id',
             1,
@@ -43,7 +43,7 @@ describe('event', function() {
         expect(bankAccountOpenedFromJson.payload.customer.email).equal(bankAccountOpened.payload.customer.email);
     });
 
-    it('multiple event serialization and deserialization', function() {
+    it('multiple event serialization and deserialization', () => {
         const bankAccountOpened = new BankAccountOpened(
             'some id',
             1,
@@ -57,6 +57,9 @@ describe('event', function() {
             }
         );
 
+        console.log('bankAccountOpened');
+        console.log(bankAccountOpened.object());
+
         const bankAccountTransactionAppended = new BankAccountTransactionAppended(
             'some id',
             2,
@@ -66,23 +69,23 @@ describe('event', function() {
         );
         const eventStream: StoredEvent[] = [
             {
+                name: bankAccountOpened.name,
                 aggregateId: bankAccountOpened.aggregateId,
                 aggregateVersion: bankAccountOpened.aggregateVersion,
                 payload: JSON.stringify(bankAccountOpened.payload),
-                topic: bankAccountOpened.name,
                 occuredAt: bankAccountOpened.occuredAt
             },
             {
+                name: bankAccountTransactionAppended.name,
                 aggregateId: bankAccountTransactionAppended.aggregateId,
                 aggregateVersion: bankAccountTransactionAppended.aggregateVersion,
                 payload: JSON.stringify(bankAccountTransactionAppended.payload),
-                topic: bankAccountTransactionAppended.name,
                 occuredAt: bankAccountTransactionAppended.occuredAt
             }
         ];
 
         const events = eventStream.map((storedEvent: StoredEvent) => {
-            switch (storedEvent.topic) {
+            switch (storedEvent.name) {
                 case BankAccountOpened.name:
                     return new BankAccountOpened(
                         storedEvent.aggregateId,
@@ -107,7 +110,7 @@ describe('event', function() {
         const bankAccountTransactionAppendedDeserialized = events[1];
 
         expect(bankAccountOpenedDeserialized instanceof BankAccountOpened).equal(true);
-        expect(bankAccountOpenedDeserialized?.payload.customer.profile.email).equal(bankAccountOpened.payload.customer.email);
+        expect(bankAccountOpenedDeserialized?.payload.customer.email).equal(bankAccountOpened.payload.customer.email);
         expect(bankAccountTransactionAppendedDeserialized instanceof BankAccountTransactionAppended).equal(true);
         expect(bankAccountTransactionAppendedDeserialized?.payload.newBalance).equal(bankAccountTransactionAppended.payload.newBalance);
     });
