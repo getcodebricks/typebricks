@@ -10,13 +10,13 @@ export interface BankAccountOpenedPayload extends EventPayload {
 }
 
 export class BankAccountOpened extends Event<BankAccountOpenedPayload> {
-    constructor(aggregateId: string, aggregateVersion: number, payload: BankAccountOpenedPayload, occuredAt: Date = new Date()) {
+    constructor(aggregateId: string, aggregateVersion: number, payload: BankAccountOpenedPayload, occurredAt: Date = new Date()) {
         super(
             aggregateId,
             aggregateVersion,
             BankAccountOpened.name,
             payload,
-            occuredAt
+            occurredAt
         );
     }
 }

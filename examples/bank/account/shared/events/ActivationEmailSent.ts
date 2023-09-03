@@ -5,13 +5,13 @@ export interface ActivationEmailSentPayload extends EventPayload {
 }
 
 export class ActivationEmailSent extends Event<ActivationEmailSentPayload> {
-    constructor(aggregateId: string, aggregateVersion: number, payload: ActivationEmailSentPayload, occuredAt: Date = new Date()) {
+    constructor(aggregateId: string, aggregateVersion: number, payload: ActivationEmailSentPayload, occurredAt: Date = new Date()) {
         super(
             aggregateId,
             aggregateVersion,
             ActivationEmailSent.name,
             payload,
-            occuredAt
+            occurredAt
         );
     }
 }

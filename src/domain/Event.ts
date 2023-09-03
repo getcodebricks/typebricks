@@ -5,7 +5,7 @@ export interface EventDto {
     aggregateVersion: number,
     name: string,
     payload: any,
-    occuredAt: Date
+    occurredAt: Date
 }
 
 export interface EventPayload {
@@ -17,14 +17,14 @@ export class Event <TPayload extends EventPayload> {
     readonly aggregateVersion: number;
     readonly name: string;
     readonly payload: TPayload;
-    readonly occuredAt: Date;
+    readonly occurredAt: Date;
 
-    constructor(aggregateId: string, aggregateVersion: number, name: string, payload: TPayload, occuredAt: Date) {
+    constructor(aggregateId: string, aggregateVersion: number, name: string, payload: TPayload, occurredAt: Date) {
         this.aggregateId = aggregateId;
         this.aggregateVersion = aggregateVersion;
         this.name = name;
         this.payload = payload;
-        this.occuredAt = occuredAt;
+        this.occurredAt = occurredAt;
     }
 
     object() {
@@ -33,7 +33,7 @@ export class Event <TPayload extends EventPayload> {
             aggregateVersion: this.aggregateVersion,
             name: this.name,
             payload: JSON.stringify(this.payload),
-            occuredAt: this.occuredAt
+            occurredAt: this.occurredAt
         }
     }
 }

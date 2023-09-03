@@ -5,13 +5,13 @@ export interface BankAccountTransactionAppendedPayload extends EventPayload {
 }
 
 export class BankAccountTransactionAppended extends Event<BankAccountTransactionAppendedPayload> {
-    constructor(aggregateId: string, aggregateVersion: number, payload: BankAccountTransactionAppendedPayload, occuredAt: Date = new Date()) {
+    constructor(aggregateId: string, aggregateVersion: number, payload: BankAccountTransactionAppendedPayload, occurredAt: Date = new Date()) {
         super(
             aggregateId,
             aggregateVersion,
             BankAccountTransactionAppended.name,
             payload,
-            occuredAt
+            occurredAt
         );
     }
 }

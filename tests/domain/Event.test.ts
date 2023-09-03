@@ -32,13 +32,13 @@ describe('event', () => {
             obj.aggregateId,
             obj.aggregateVersion,
             obj.payload,
-            new Date(obj.occuredAt)
+            new Date(obj.occurredAt)
         );
 
         expect(bankAccountOpenedFromJson.name).equal(BankAccountOpened.name);
         expect(bankAccountOpenedFromJson.aggregateId).equal(bankAccountOpened.aggregateId);
         expect(bankAccountOpenedFromJson.aggregateVersion).equal(bankAccountOpened.aggregateVersion);
-        expect(bankAccountOpenedFromJson.occuredAt.toDateString()).equal(bankAccountOpened.occuredAt.toDateString());
+        expect(bankAccountOpenedFromJson.occurredAt.toDateString()).equal(bankAccountOpened.occurredAt.toDateString());
         expect(bankAccountOpenedFromJson.payload.status).equal(bankAccountOpened.payload.status);
         expect(bankAccountOpenedFromJson.payload.customer.email).equal(bankAccountOpened.payload.customer.email);
     });
@@ -73,14 +73,14 @@ describe('event', () => {
                 aggregateId: bankAccountOpened.aggregateId,
                 aggregateVersion: bankAccountOpened.aggregateVersion,
                 payload: JSON.stringify(bankAccountOpened.payload),
-                occuredAt: bankAccountOpened.occuredAt
+                occurredAt: bankAccountOpened.occurredAt
             },
             {
                 name: bankAccountTransactionAppended.name,
                 aggregateId: bankAccountTransactionAppended.aggregateId,
                 aggregateVersion: bankAccountTransactionAppended.aggregateVersion,
                 payload: JSON.stringify(bankAccountTransactionAppended.payload),
-                occuredAt: bankAccountTransactionAppended.occuredAt
+                occurredAt: bankAccountTransactionAppended.occurredAt
             }
         ];
 
@@ -91,7 +91,7 @@ describe('event', () => {
                         storedEvent.aggregateId,
                         storedEvent.aggregateVersion,
                         JSON.parse(storedEvent.payload),
-                        new Date(storedEvent.occuredAt)
+                        new Date(storedEvent.occurredAt)
                     );
 
                 case BankAccountTransactionAppended.name:
@@ -99,7 +99,7 @@ describe('event', () => {
                         storedEvent.aggregateId,
                         storedEvent.aggregateVersion,
                         JSON.parse(storedEvent.payload),
-                        new Date(storedEvent.occuredAt)
+                        new Date(storedEvent.occurredAt)
                     );
             }
         });

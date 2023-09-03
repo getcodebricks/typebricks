@@ -3,5 +3,5 @@ export interface StoredEvent {
     aggregateVersion: number,
     name: string,
     payload: string,
-    occuredAt: Date
+    occurredAt: Date
 };

@@ -45,7 +45,7 @@ export class BankAccountRepository {
         //                 storedEvent.aggregateId,
         //                 storedEvent.aggregateVersion,
         //                 JSON.parse(storedEvent.payload),
-        //                 new Date(storedEvent.occuredAt)
+        //                 new Date(storedEvent.occurredAt)
         //             );
 
         //         case BankAccountTransactionAppended.name:
@@ -53,7 +53,7 @@ export class BankAccountRepository {
         //                 storedEvent.aggregateId,
         //                 storedEvent.aggregateVersion,
         //                 JSON.parse(storedEvent.payload),
-        //                 new Date(storedEvent.occuredAt)
+        //                 new Date(storedEvent.occurredAt)
         //             );
 
         //         case ActivationEmailSent.name:
@@ -61,7 +61,7 @@ export class BankAccountRepository {
         //                 storedEvent.aggregateId,
         //                 storedEvent.aggregateVersion,
         //                 JSON.parse(storedEvent.payload),
-        //                 new Date(storedEvent.occuredAt)
+        //                 new Date(storedEvent.occurredAt)
         //             );
         //     }
         // }).filter(Boolean) as Array<BankAccountOpened | BankAccountTransactionAppended | ActivationEmailSent>;
@@ -102,7 +102,7 @@ export class BankAccountRepository {
                     bankAccountEvent.aggregateId = pendingEvent.aggregateId;
                     bankAccountEvent.aggregateVersion = pendingEvent.aggregateVersion;
                     bankAccountEvent.payload = JSON.stringify(pendingEvent.payload);
-                    bankAccountEvent.occuredAt = pendingEvent.occuredAt;
+                    bankAccountEvent.occurredAt = pendingEvent.occurredAt;
 
                     await transactionalEntityManager.insert(
                         BankAccountEventStreamEntity,
@@ -145,7 +145,7 @@ class EventFactory {
             storedEvent.aggregateId,
             storedEvent.aggregateVersion,
             JSON.parse(storedEvent.payload),
-            new Date(storedEvent.occuredAt)
+            new Date(storedEvent.occurredAt)
         );
     }
 
@@ -154,7 +154,7 @@ class EventFactory {
             storedEvent.aggregateId,
             storedEvent.aggregateVersion,
             JSON.parse(storedEvent.payload),
-            new Date(storedEvent.occuredAt)
+            new Date(storedEvent.occurredAt)
         );
     }
 
@@ -163,7 +163,7 @@ class EventFactory {
             storedEvent.aggregateId,
             storedEvent.aggregateVersion,
             JSON.parse(storedEvent.payload),
-            new Date(storedEvent.occuredAt)
+            new Date(storedEvent.occurredAt)
         );
     }
 }
