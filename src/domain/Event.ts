@@ -1,5 +1,6 @@
-import { AggregateState } from "./Aggregate";
-
+/**
+ * @deprecated Replaced with EventMessage
+ */
 export interface EventDto {
     aggregateId: string,
     aggregateVersion: number,
