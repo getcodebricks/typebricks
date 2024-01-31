@@ -1,28 +1,29 @@
 import { Command, CommandPayload } from "../../../../../src/domain/Command";
-import { BankAccountId } from "../../shared/valueObjects/BankAccountId";
+import { BankAccountIdValueObject } from "../../shared/valueObjects/BankAccountIdValueObject";
+
 
 export interface SendActivationEmailCommandDto {
     bankAccountId: string
 }
 
 export interface SendActivationEmailCommandPayload extends CommandPayload {
-    bankAccountId: BankAccountId,
+    bankAccountId: BankAccountIdValueObject,
 }
 
 export class SendActivationEmailCommand extends Command<SendActivationEmailCommandPayload> {
-    get bankAccountId (): BankAccountId {
+    get bankAccountId(): BankAccountIdValueObject {
         return this.payload.bankAccountId;
     }
 
-    constructor (payload: SendActivationEmailCommandPayload) {
+    constructor(payload: SendActivationEmailCommandPayload) {
         super(payload);
     }
 
     static fromDto(dto: SendActivationEmailCommandDto): SendActivationEmailCommand {
-        return new this({
-            bankAccountId: new BankAccountId({
-                value: dto.bankAccountId
-            })
-        });
+        return new this(
+            {
+                bankAccountId: new BankAccountIdValueObject(dto.bankAccountId)
+            }
+        );
     }
 }

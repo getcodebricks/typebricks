@@ -3,7 +3,7 @@ import { EntitySchema } from "typeorm";
 interface BankAccountOverview {
     id?: string;
     aggregateId: string;
-    firstname: string;
+    firstName: string;
     email: string;
     active: boolean;
     balance: number;
@@ -20,7 +20,7 @@ const BankAccountOverviewEntity = new EntitySchema<BankAccountOverview>({
         aggregateId: {
             type: 'uuid'
         },
-        firstname: {
+        firstName: {
             type: 'varchar',
             default: null,
         },

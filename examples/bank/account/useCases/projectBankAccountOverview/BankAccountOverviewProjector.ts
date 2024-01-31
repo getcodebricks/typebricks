@@ -47,7 +47,7 @@ class BankAccountOverviewProjector {
     async projectBankAccountOpened(state: BankAccountOverview | null, payload: BankAccountOpenedPayload, aggregateId: string, aggregateVersion: number): Promise<BankAccountOverview> {
         const newState: BankAccountOverview = {
             aggregateId: aggregateId,
-            firstname: payload.customer.firstname,
+            firstName: payload.customer.firstName,
             email: payload.customer.email,
             active: false,
             balance: 0.0
@@ -59,7 +59,7 @@ class BankAccountOverviewProjector {
     async projectActivationEmailSent(state: BankAccountOverview | null, payload: ActivationEmailSentPayload, aggregateId: string, aggregateVersion: number): Promise<BankAccountOverview> {
         const newState: BankAccountOverview = {
             aggregateId: aggregateId,
-            firstname: state ? state.firstname : '',
+            firstName: state ? state.firstName : '',
             email: state? state.email : '',
             active: state ? state.active : false,
             balance: state ? state.balance : 0.0
@@ -70,7 +70,7 @@ class BankAccountOverviewProjector {
     async projectBankAccountTransactionAppended(state: BankAccountOverview | null, payload: BankAccountTransactionAppendedPayload, aggregateId: string, aggregateVersion: number): Promise<BankAccountOverview> {
         const newState: BankAccountOverview = {
             aggregateId: aggregateId,
-            firstname: state ? state.firstname : '',
+            firstName: state ? state.firstName : '',
             email: state? state.email : '',
             active: state ? state.active : false,
             balance: payload.newBalance

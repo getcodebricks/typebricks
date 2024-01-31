@@ -32,7 +32,7 @@ describe('bank account overview projection', function() {
             {
                 customer: {
                     email: 'peter@provider.com',
-                    firstname: 'Peter'
+                    firstName: 'Peter'
                 },
                 balance: 0.0,
                 status: 'NOT_ACTIVATED'
@@ -53,7 +53,7 @@ describe('bank account overview projection', function() {
         });
 
         expect(state?.aggregateId).equal(bankAccountOpened.aggregateId);
-        expect(state?.firstname).equal(bankAccountOpened.payload.customer.firstname);
+        expect(state?.firstName).equal(bankAccountOpened.payload.customer.firstName);
         expect(state?.email).equal(bankAccountOpened.payload.customer.email);
         expect(state?.active).equal(false);
         expect(state?.balance).equal(bankAccountOpened.payload.balance);
@@ -80,7 +80,7 @@ describe('bank account overview projection', function() {
             {
                 customer: {
                     email: 'peter1@provider.com',
-                    firstname: 'Peter1'
+                    firstName: 'Peter1'
                 },
                 balance: 0.0,
                 status: 'NOT_ACTIVATED'
@@ -103,7 +103,7 @@ describe('bank account overview projection', function() {
         });
 
         expect(state?.aggregateId).equal(bankAccountOpened.aggregateId);
-        expect(state?.firstname).equal(bankAccountOpened.payload.customer.firstname);
+        expect(state?.firstName).equal(bankAccountOpened.payload.customer.firstName);
         expect(state?.email).equal(bankAccountOpened.payload.customer.email);
         expect(state?.active).equal(false);
         expect(state?.balance).equal(bankAccountOpened.payload.balance);

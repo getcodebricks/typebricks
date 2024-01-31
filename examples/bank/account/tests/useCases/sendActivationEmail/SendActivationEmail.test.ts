@@ -7,18 +7,15 @@ import { ValidationError } from "../../../../../../src/domain/ValidationError";
 
 import { SQSEvent, SQSRecord } from 'aws-lambda/trigger/sqs';
 import { handler } from '../../../useCases/sendActivationEmail/SendActivationEmailPolicyHandler';
-import { SendActivationEmailCommand } from '../../../useCases/SendActivationEmail/SendActivationEmailCommand';
-import { SendActivationEmailCommandHandler } from '../../../useCases/SendActivationEmail/SendActivationEmailCommandHandler';
 import { BankAccountRepository } from '../../../shared/BankAccountRepository';
 import { BankAccount } from '../../../shared/BankAccount';
-import { Customer } from '../../../shared/valueObjects/Customer';
-import { Firstname } from '../../../shared/valueObjects/Firstname';
-import { Email } from '../../../shared/valueObjects/Email';
-import { StatusValues } from '../../../shared/valueObjects/Status';
 
 import { v4 as uuid } from "uuid";
 import { assert } from 'console';
 import { DomainError } from '../../../../../../src/domain/DomainError';
+import { CustomerValueObject } from '../../../shared/valueObjects/CustomerValueObject';
+import { FirstNameValueObject } from '../../../shared/valueObjects/FirstNameValueObject';
+import { EmailValueObject } from '../../../shared/valueObjects/EmailValueObject';
 
 describe('send activation email', function() {
     it('send activation email api handler', async function() {
@@ -30,14 +27,10 @@ describe('send activation email', function() {
         const bankAccountRepository: BankAccountRepository = new BankAccountRepository();
         const bankAccount = new BankAccount(uuid());
         bankAccount.open(
-            new Customer({
-                firstname: new Firstname({
-                    value: 'Peter'
-                }),
-                email: new Email({
-                    value: 'peter@provider.com'
-                })
-            })
+            new CustomerValueObject(
+                new FirstNameValueObject('Peter'),
+                new EmailValueObject('peter@provider.com')
+            )
         );
         await bankAccountRepository.save(bankAccount);
 

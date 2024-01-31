@@ -1,54 +1,21 @@
 import { expect } from 'chai';
 
 import { BankAccount } from '../examples/bank/account/shared/BankAccount';
-import { AppendTransaction  } from '../examples/bank/account/useCases/appendTransaction/AppendTransaction';
-import { OpenBankAccount  } from '../examples/bank/account/useCases/openBankAccount/OpenBankAccountCommand';
 import { ValidationError } from "../src/domain/ValidationError";
-import { Amount } from '../examples/bank/account/shared/valueObjects/Amount';
-import { Customer } from '../examples/bank/account/shared/valueObjects/Customer';
-import { Profile } from '../examples/bank/account/shared/valueObjects/Profile';
-import { Firstname } from '../examples/bank/account/shared/valueObjects/Firstname';
-import { Email } from '../examples/bank/account/shared/valueObjects/Email';
-import { Status, StatusValues } from '../examples/bank/account/shared/valueObjects/Status';
-import { Balance } from '../examples/bank/account/shared/valueObjects/Balance';
+import { AppendTransactionCommand } from '../examples/bank/account/useCases/appendTransaction/AppendTransactionCommand';
+import { OpenBankAccountCommand } from '../examples/bank/account/useCases/openBankAccount/OpenBankAccountCommand';
+import { CustomerValueObject } from '../examples/bank/account/shared/valueObjects/CustomerValueObject';
+import { EmailValueObject } from '../examples/bank/account/shared/valueObjects/EmailValueObject';
+import { FirstNameValueObject } from '../examples/bank/account/shared/valueObjects/FirstNameValueObject';
 
 describe('use case', function() {
     it('bank account open and append transaction', function() {
-        const bodyObjectOpenBankAccount = {
-            profile: new Profile({
-                firstname: new Firstname({
-                    value: 'Peter'
-                }),
-                email: new Email({
-                    value: 'name@provider.com'
-                })
-            }),
-            status: new Status({
-                value: StatusValues.NOT_ACTIVATED
-            })
-        };
-        const bodyJsonOpenBankAccount = JSON.stringify(bodyObjectOpenBankAccount);
-        const bodyOpenBankAccount = JSON.parse(bodyJsonOpenBankAccount);
-        const openBankAccount = new OpenBankAccount(bodyOpenBankAccount);
-        
         const bankAccount = new BankAccount('some id');
         bankAccount.open(
-            new Customer({
-                profile: new Profile({
-                    firstname: new Firstname({
-                        value: 'Peter'
-                    }),
-                    email: new Email({
-                        value: 'name@provider.com'
-                    })
-                }),
-                status: new Status({
-                    value: StatusValues.NOT_ACTIVATED
-                })
-            }),
-            new Balance({
-                value: 0.0
-            })
+            new CustomerValueObject(
+                new EmailValueObject('name@provider.com'),
+                new FirstNameValueObject('Hans')
+            )
         );
         expect(bankAccount.version).equal(1);
         expect(bankAccount.state.balance.value).equal(0.0);
@@ -62,7 +29,7 @@ describe('use case', function() {
         };
         const bodyAppendTransaction = JSON.stringify(bodyObjectAppendTransaction);
         const bodyJsonAppendTransaction = JSON.parse(bodyAppendTransaction);
-        const appendTransaction = AppendTransaction.fromDto(bodyJsonAppendTransaction);
+        const appendTransaction = AppendTransactionCommand.fromDto(bodyJsonAppendTransaction);
         bankAccount.appendTransaction(
             appendTransaction.amount
         );

@@ -4,12 +4,7 @@ import { StoredEvent } from '../../src/application/StoredEvent';
 import { BankAccount } from '../../examples/bank/account/shared/BankAccount';
 import { BankAccountOpened, BankAccountOpenedPayload  } from '../../examples/bank/account/shared/events/BankAccountOpened';
 import { BankAccountTransactionAppended  } from '../../examples/bank/account/shared/events/BankAccountTransactionAppended';
-import { Amount } from '../../examples/bank/account/shared/valueObjects/Amount';
-import { Customer } from '../../examples/bank/account/shared/valueObjects/Customer';
-import { Firstname } from '../../examples/bank/account/shared/valueObjects/Firstname';
-import { Email } from '../../examples/bank/account/shared/valueObjects/Email';
-import { Status, StatusValues } from '../../examples/bank/account/shared/valueObjects/Status';
-import { Balance } from '../../examples/bank/account/shared/valueObjects/Balance';
+import { StatusValues } from '../../examples/bank/account/shared/valueObjects/StatusValueObject';
 
 describe('event', () => {
     it('one event serialization and deserialization', () => {
@@ -19,7 +14,7 @@ describe('event', () => {
             {
                 customer: {
                         email: 'name@provider.com',
-                        firstname: 'Peter'
+                        firstName: 'Peter'
                 },
                 status: StatusValues.NOT_ACTIVATED,
                 balance: 0.0
@@ -50,15 +45,12 @@ describe('event', () => {
             {
                 customer: {
                     email: 'name@provider.com',
-                    firstname: 'Peter'
+                    firstName: 'Peter'
                 },
                 status: StatusValues.NOT_ACTIVATED,
                 balance: 0.0
             }
         );
-
-        console.log('bankAccountOpened');
-        console.log(bankAccountOpened.object());
 
         const bankAccountTransactionAppended = new BankAccountTransactionAppended(
             'some id',

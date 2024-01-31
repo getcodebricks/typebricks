@@ -1,38 +1,37 @@
+import common from "mocha/lib/interfaces/common";
 import { Command, CommandPayload } from "../../../../../src/domain/Command";
-import { Customer } from "../../shared/valueObjects/Customer";
-import { Email } from "../../shared/valueObjects/Email";
-import { Firstname } from "../../shared/valueObjects/Firstname";
+import { CustomerValueObject } from "../../shared/valueObjects/CustomerValueObject";
+import { EmailValueObject } from "../../shared/valueObjects/EmailValueObject";
+import { FirstNameValueObject } from "../../shared/valueObjects/FirstNameValueObject";
 
 export interface OpenBankAccountCommandDto {
     customer: {
         email: string,
-        firstname: string
+        firstName: string
     }
 }
 
 export interface OpenBankAccountCommandPayload extends CommandPayload {
-    customer: Customer;
+    customer: CustomerValueObject;
 }
 
 export class OpenBankAccountCommand extends Command<OpenBankAccountCommandPayload> {
-    get customer (): Customer {
+    get customer(): CustomerValueObject {
         return this.payload.customer;
     }
 
-    constructor (payload: OpenBankAccountCommandPayload) {
+    constructor(payload: OpenBankAccountCommandPayload) {
         super(payload);
     }
 
     static fromDto(dto: OpenBankAccountCommandDto): OpenBankAccountCommand {
-        return new this({
-            customer: new Customer({
-                email: new Email({
-                    value: dto.customer.email
-                }),
-                firstname: new Firstname({
-                    value: dto.customer.firstname
-                })
-            })
-        });
+        return new this(
+            {
+                customer: new CustomerValueObject(
+                    new EmailValueObject(dto.customer.email),
+                    new FirstNameValueObject(dto.customer.firstName),
+                )
+            }
+        );
     }
 }

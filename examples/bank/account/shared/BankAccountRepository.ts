@@ -9,7 +9,7 @@ import { BankAccountOpened } from "./events/BankAccountOpened";
 import { BankAccountTransactionAppended } from "./events/BankAccountTransactionAppended";
 import { ActivationEmailSent } from "./events/ActivationEmailSent";
 import { BankAccountEventStreamEntity } from "./BankAccountEventStreamEntity";
-import { AppDataSource } from "./AppDataSource";
+import { AppDataSource } from "./AppDatasource";
 
 const sns = new SNSClient({});
 
@@ -98,7 +98,7 @@ export class BankAccountRepository {
                 }
                 for (let index = 0; index < aggregate.pendingEvents.length; index++) {
                     const pendingEvent = aggregate.pendingEvents[index];
-                    const bankAccountEvent: BankAccountEventStreamEntity = new BankAccountEventStreamEntity();
+                    const bankAccountEvent: BankAccountEventStreamEntity = new BankAccountEventStreamEntity(pendingEvent.aggregateId);
                     bankAccountEvent.aggregateId = pendingEvent.aggregateId;
                     bankAccountEvent.aggregateVersion = pendingEvent.aggregateVersion;
                     bankAccountEvent.payload = JSON.stringify(pendingEvent.payload);

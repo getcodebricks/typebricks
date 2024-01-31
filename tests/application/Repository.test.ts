@@ -5,15 +5,13 @@ import { BankAccountRepository } from '../../examples/bank/account/shared/BankAc
 import { BankAccountEventStreamEntity } from '../../examples/bank/account/shared/BankAccountEventStreamEntity';
 import { BankAccount, BankAccountState } from '../../examples/bank/account/shared/BankAccount';
 import { ValidationError } from "../../src/domain/ValidationError";
-import { Amount } from '../../examples/bank/account/shared/valueObjects/Amount';
-import { Email } from '../../examples/bank/account/shared/valueObjects/Email';
-import { Customer } from '../../examples/bank/account/shared/valueObjects/Customer';
-import { Firstname } from '../../examples/bank/account/shared/valueObjects/Firstname';
-import { Status, StatusValues } from '../../examples/bank/account/shared/valueObjects/Status';
 
 import { mockClient } from 'aws-sdk-client-mock';
 import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
-import { Balance } from '../../examples/bank/account/shared/valueObjects/Balance';
+import { CustomerValueObject } from '../../examples/bank/account/shared/valueObjects/CustomerValueObject';
+import { EmailValueObject } from '../../examples/bank/account/shared/valueObjects/EmailValueObject';
+import { FirstNameValueObject } from '../../examples/bank/account/shared/valueObjects/FirstNameValueObject';
+import { AmountValueObject } from '../../examples/bank/account/shared/valueObjects/AmountValueObject';
 const snsMock = mockClient(SNSClient);
 
 describe('repository', function() {
@@ -34,19 +32,13 @@ describe('repository', function() {
 
         const bankAccount = new BankAccount(uuid());
         bankAccount.open(
-            new Customer({
-                firstname: new Firstname({
-                    value: 'Peter'
-                }),
-                email: new Email({
-                    value: 'name@provider.com'
-                })
-            })
+            new CustomerValueObject(
+                new EmailValueObject('name@provider.com'),
+                new FirstNameValueObject('Hans')
+            )
         );
         bankAccount.appendTransaction(
-            new Amount({
-                value: 20.0
-            })
+            new AmountValueObject(20.0)
         );
 
         const pendingEvents = bankAccount.pendingEvents;
@@ -56,7 +48,7 @@ describe('repository', function() {
         const bankAccountLoaded = await bankAccountRepository.get(bankAccount.id);
         expect(bankAccount.id).equal(bankAccountLoaded?.id);
         expect(bankAccount.version).equal(bankAccountLoaded?.version);
-        expect(bankAccount.state.customer.firstname.value).equal(bankAccountLoaded?.state.customer.firstname.value);
+        expect(bankAccount.state.customer.firstName.value).equal(bankAccountLoaded?.state.customer.firstName.value);
         expect(bankAccount.state.customer.email.value).equal(bankAccountLoaded?.state.customer.email.value);
 
         const snsCalls = snsMock.calls();

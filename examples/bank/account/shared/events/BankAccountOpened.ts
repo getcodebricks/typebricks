@@ -3,7 +3,7 @@ import { Event, EventPayload } from "../../../../../src/domain/Event";
 export interface BankAccountOpenedPayload extends EventPayload {
     customer: {
         email: string,
-        firstname: string
+        firstName: string
     };
     balance: number;
     status: string;

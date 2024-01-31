@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { AppendTransaction } from '../examples/bank/account/useCases/appendTransaction/AppendTransaction';
+import { AppendTransactionCommand } from '../examples/bank/account/useCases/appendTransaction/AppendTransactionCommand';
 
 describe('command', function() {
     it('command', function() {
@@ -10,7 +10,7 @@ describe('command', function() {
         const bodyHttpRequest = JSON.stringify(bodyObject);
         const body = JSON.parse(bodyHttpRequest);
 
-        const appendTransaction = AppendTransaction.fromDto(body);
+        const appendTransaction = AppendTransactionCommand.fromDto(body);
         expect(appendTransaction.bankAccountId).equal(bodyObject.bankAccountId);
         expect(appendTransaction.amount.value).equal(bodyObject.amount);
     });
@@ -22,7 +22,7 @@ describe('command', function() {
         const bodyHttpRequest = JSON.stringify(bodyObjectInvalid);
         const body = JSON.parse(bodyHttpRequest);
 
-        const appendTransaction = new AppendTransaction(body);
+        const appendTransaction = new AppendTransactionCommand(body);
         expect(appendTransaction.bankAccountId).equal(bodyObjectInvalid.bankAccountId);
         expect(appendTransaction.amount).equal(undefined);
     });

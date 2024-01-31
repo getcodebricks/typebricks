@@ -34,7 +34,7 @@ describe('get bank account overview', function() {
             {
                 customer: {
                     email: 'peter@provider.com',
-                    firstname: 'Peter'
+                    firstName: 'Peter'
                 },
                 balance: 0.0,
                 status: 'NOT_ACTIVATED'
@@ -58,7 +58,7 @@ describe('get bank account overview', function() {
         const bankAccountOverview: BankAccountOverview | null = await queryHandler.handle(query);
 
         expect(bankAccountOverview?.aggregateId).equal(bankAccountOpened.aggregateId);
-        expect(bankAccountOverview?.firstname).equal(bankAccountOpened.payload.customer.firstname);
+        expect(bankAccountOverview?.firstName).equal(bankAccountOpened.payload.customer.firstName);
         expect(bankAccountOverview?.email).equal(bankAccountOpened.payload.customer.email);
         expect(bankAccountOverview?.active).equal(false);
         expect(bankAccountOverview?.balance).equal(bankAccountOpened.payload.balance);

@@ -10,10 +10,10 @@ import { handler } from '../../../useCases/openBankAccount/OpenBankAccountApiHan
 import { OpenBankAccountCommand } from '../../../useCases/openBankAccount/OpenBankAccountCommand';
 import { OpenBankAccountCommandHandler } from '../../../useCases/openBankAccount/OpenBankAccountCommandHandler';
 import { BankAccountRepository } from '../../../shared/BankAccountRepository';
-import { Customer } from '../../../shared/valueObjects/Customer';
-import { Firstname } from '../../../shared/valueObjects/Firstname';
-import { Email } from '../../../shared/valueObjects/Email';
-import { StatusValues } from '../../../shared/valueObjects/Status';
+import { CustomerValueObject } from '../../../shared/valueObjects/CustomerValueObject';
+import { EmailValueObject } from '../../../shared/valueObjects/EmailValueObject';
+import { FirstNameValueObject } from '../../../shared/valueObjects/FirstNameValueObject';
+import { StatusValues } from '../../../shared/valueObjects/StatusValueObject';
 
 describe('open bank account', function() {
     it('open bank account api handler', async function() {
@@ -25,7 +25,7 @@ describe('open bank account', function() {
         const bodyObject = {
             customer: {
                 email: 'name@provider.com',
-                firstname: 'Peter'
+                firstName: 'Peter'
             }
         };
 
@@ -49,25 +49,19 @@ describe('open bank account', function() {
         const openBankAccountCommandHandler = new OpenBankAccountCommandHandler(new BankAccountRepository());
         const bankAccount = await openBankAccountCommandHandler.handle(
             new OpenBankAccountCommand({
-                customer: new Customer({
-                    email: new Email({
-                        value: 'name@provider.com'
-                    }),
-                    firstname: new Firstname({
-                        value: 'Hans'
-                    })
-                })
+                customer: new CustomerValueObject(
+                    new EmailValueObject('name@provider.com'),
+                    new FirstNameValueObject('Hans'),
+                )
             })
         );
 
         expect(bankAccount?.pendingEvents.length).equal(0);
         expect(bankAccount?.version).equal(1);
-        expect(bankAccount?.state.customer.firstname.value).equal('Hans');
+        expect(bankAccount?.state.customer.firstName.value).equal('Hans');
         expect(
             bankAccount?.state.customer.email.equals(
-                new Email({
-                    value: 'name@provider.com'
-                })
+                new EmailValueObject('name@provider.com')
             )
         ).equal(true);
         expect(bankAccount?.state.balance.value).equal(0.0);
@@ -78,12 +72,12 @@ describe('open bank account', function() {
         const bodyObject = {
             customer: {
                 email: 'name@provider.com',
-                firstname: 'Peter'
+                firstName: 'Peter'
             }
         };
         const openBankAccountCommand = OpenBankAccountCommand.fromDto(bodyObject);
         expect(openBankAccountCommand.customer.email.value).equal(bodyObject.customer.email);
-        expect(openBankAccountCommand.customer.firstname.value).equal(bodyObject.customer.firstname);
+        expect(openBankAccountCommand.customer.firstName.value).equal(bodyObject.customer.firstName);
     });
 
     it('open bank account command invalid email', async function() {
@@ -95,7 +89,7 @@ describe('open bank account', function() {
         const bodyObject = {
             customer: {
                 email: 'nameATprovider.com',
-                firstname: 'Peter'
+                firstName: 'Peter'
             }
         };
 
@@ -109,7 +103,7 @@ describe('open bank account', function() {
         expect(result?.statusCode).equal(400);
     });
 
-    it('open bank account command missing firstname', async function() {
+    it('open bank account command missing firstName', async function() {
         snsMock.reset();
         snsMock.on(PublishCommand).resolves({
             MessageId: '12345678-1111-2222-3333-111122223333',
