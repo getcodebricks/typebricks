@@ -25,13 +25,16 @@ export abstract class Aggregate<TState extends AggregateState> {
     }
 
     applyEvent(event: Event<EventPayload>): void {
+        if (this.version != (event.aggregateVersion - 1)) {
+            throw new Error(`can not apply event with aggregate version ${event.aggregateVersion} to aggregate with version ${this.version}`);
+        }
         const newState = this.apply(event);
-        if (newState) {
-            this.state = newState;
-            this.version = event.aggregateVersion;
-        } else {
+
+        if (!newState) {
             throw new Error(`can not apply event ${event.name} to aggregate`);
         }
+        this.state = newState;
+        this.version = event.aggregateVersion;
     }
 
     loadFromHistory(events: Event<EventPayload>[]): void {

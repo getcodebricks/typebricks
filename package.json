@@ -1,7 +1,7 @@
 {
     "name": "dddtsframework",
     "private": true,
-    "version": "0.0.48",
+    "version": "0.0.55",
     "description": "",
     "main": "index.js",
     "types": "index.d.ts",
@@ -19,7 +19,17 @@
         "coverage": "nyc -r text -e .ts -x \"tests/*.test.ts\" npm run test",
         "migration": "ts-node ./node_modules/typeorm/cli.js migration:run -d ./src/infrastructure/app-data-source.ts"
     },
+    "dependencies": {
+        "is-what": "^4.1.15",
+        "node-gzip": "^1.1.2",
+        "pg": "^8.11.3",
+        "shallow-equal": "^3.1.0",
+        "shallow-equal-object": "^1.1.1",
+        "typeorm": "^0.3.6",
+        "uuid": "^8.3.2"
+    },
     "devDependencies": {
+        "@types/aws-lambda": "^8.10.97",
         "@types/chai": "^4.3.0",
         "@types/chai-as-promised": "^7.1.5",
         "@types/mocha": "^9.1.0",
@@ -33,18 +43,5 @@
         "nyc": "^15.1.0",
         "ts-node": "^10.7.0",
         "typescript": "^4.6.3"
-    },
-    "dependencies": {
-        "@aws-sdk/client-sns": "^3.82.0",
-        "@types/aws-lambda": "^8.10.97",
-        "aws-sdk": "^2.1128.0",
-        "is-what": "^4.1.15",
-        "node-gzip": "^1.1.2",
-        "pg": "^8.7.3",
-        "reflect-metadata": "^0.1.13",
-        "shallow-equal": "^3.1.0",
-        "shallow-equal-object": "^1.1.1",
-        "typeorm": "^0.3.6",
-        "uuid": "^8.3.2"
     }
 }

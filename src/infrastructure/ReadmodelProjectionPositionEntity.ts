@@ -7,16 +7,16 @@ abstract class ReadmodelProjectionPositionEntity {
     id: string;
 
     @Column()
-    readmodelName: string
+    readmodelName: string;
 
     @Column()
-    streamName: string
+    streamName: string;
 
     @Column({ type: 'int' })
-    lastProjectedNo: number
+    lastProjectedNo: number;
 
     @UpdateDateColumn({ type: 'timestamptz' })
-    updatedAt: Date
+    updatedAt: Date;
 
     constructor(readmodelName: string, streamName: string, lastProjectedNo: number) {
         this.readmodelName = readmodelName;

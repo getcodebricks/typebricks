@@ -4,22 +4,22 @@ import { Event } from "../domain/Event";
 @Entity()
 abstract class EventStreamEntity {
     @PrimaryGeneratedColumn()
-    no: number
+    no: number;
 
     @Column()
-    aggregateId: string
+    aggregateId: string;
 
     @Column({ type: 'int' })
-    aggregateVersion: number
+    aggregateVersion: number;
 
     @Column()
-    name: string
+    name: string;
 
     @Column({type: 'text'})
-    payload: string
+    payload: string;
 
     @CreateDateColumn({ type: 'timestamptz' })
-    occurredAt: Date
+    occurredAt: Date;
 
     constructor(aggregateIdOrObject: string | any, aggregateVersion?: number, name?: string, payload?: string, occurredAt?: Date) {
         if (typeof aggregateIdOrObject === 'object') {
