@@ -13,17 +13,17 @@ function customEqual(x: any, y: any): boolean {
         const e = shallowEqualArrays(x, y);
         return shallowEqualArrays(x, y);
     } else if ((typeof x) === 'object') {
-        const keysX = Object.keys(x.props);
-        const keysY = Object.keys(y.props);
+        const keysX = Object.keys(x);
+        const keysY = Object.keys(y);
         if (keysX.length != keysY.length) {
             return false;
         }
         for (var i: number = 0; i < keysX.length; i++) {
             const key = keysX[i];
-            if (!(key in y.props)) {
+            if (!(key in y)) {
                 return false;
             }
-            return shallowEqual(x.props[key].props, y.props[key].props, { debug: undefined, customEqual: customEqual });
+            return shallowEqual(x[key], y[key], { debug: undefined, customEqual: customEqual });
         }
         return true;
     }
