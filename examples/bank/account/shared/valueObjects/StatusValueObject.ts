@@ -1,7 +1,7 @@
 
 import { ValidationError } from "../../../../../src/domain/ValidationError";
 import { ValueObject } from "../../../../../src/domain/ValueObject";
-import { OverwriteProtectionBody } from "../../../../../src/OverwriteProtectionDecorator"
+import { OverwriteProtectionBody } from "../../../../../src/utils/OverwriteProtectionDecorator"
 import { shallowEqualObject } from "../../../../../src/utils/shallowEqualObject"
 import { isType } from "is-what";
 
