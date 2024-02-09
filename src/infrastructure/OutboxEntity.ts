@@ -1,31 +1,30 @@
 import { PrimaryGeneratedColumn, PrimaryColumn, Entity, Column, Unique } from "typeorm";
 
+export interface IOutboxEntity {
+    id?: string;
+    no: number;
+    name: string;
+    message: string;
+};
+
 @Entity()
 @Unique(['no'])
-abstract class OutboxEntity {
-    @PrimaryGeneratedColumn("uuid")
+export abstract class OutboxEntity {
+    @PrimaryGeneratedColumn('uuid', { name: 'id' })
     id: string;
 
-    @PrimaryColumn({ type: 'int' })
+    @PrimaryColumn({ name: 'no', type: 'int' })
     no: number;
 
-    @Column()
+    @Column({ name: 'name' })
     name: string;
 
-    @Column({type: 'text'})
+    @Column({ name: 'message', type: 'text' })
     message: string;
 
-    constructor(noOrObject: number | any, name: string, message: string) {
-        if (typeof noOrObject === 'object') {
-            this.no = noOrObject?.no;
-            this.name = noOrObject?.name;
-            this.message = noOrObject?.message;
-        } else if (noOrObject && name && message) {
-            this.no = noOrObject;
-            this.name = name;
-            this.message = message;
-        }
+    constructor(props: IOutboxEntity) {
+        this.no = props.no;
+        this.name = props.name;
+        this.message = props.message;
     }
 }
-
-export { OutboxEntity };

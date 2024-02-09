@@ -1,28 +1,34 @@
 import { PrimaryGeneratedColumn, Entity, Column, UpdateDateColumn, Unique } from "typeorm";
 
-@Entity()
-@Unique(['readmodelName', 'streamName'])
-abstract class ReadmodelProjectionPositionEntity {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
-
-    @Column()
+export interface IReadmodelProjectionPositionEntity {
+    id?: string;
     readmodelName: string;
-
-    @Column()
     streamName: string;
-
-    @Column({ type: 'int' })
     lastProjectedNo: number;
-
-    @UpdateDateColumn({ type: 'timestamptz' })
     updatedAt: Date;
-
-    constructor(readmodelName: string, streamName: string, lastProjectedNo: number) {
-        this.readmodelName = readmodelName;
-        this.streamName = streamName;
-        this.lastProjectedNo = lastProjectedNo;
-    }
 }
 
-export { ReadmodelProjectionPositionEntity };
+@Entity()
+@Unique(['readmodelName', 'streamName'])
+export abstract class ReadmodelProjectionPositionEntity {
+    @PrimaryGeneratedColumn('uuid', { name: 'id' })
+    id: string;
+
+    @Column({ name: 'readmodel_name' })
+    readmodelName: string;
+
+    @Column({ name: 'stream_name' })
+    streamName: string;
+
+    @Column({ name: 'last_projected_no', type: 'int' })
+    lastProjectedNo: number;
+
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+    updatedAt: Date;
+
+    constructor(props: IReadmodelProjectionPositionEntity) {
+        this.readmodelName = props.readmodelName;
+        this.streamName = props.streamName;
+        this.lastProjectedNo = props.lastProjectedNo;
+    }
+}

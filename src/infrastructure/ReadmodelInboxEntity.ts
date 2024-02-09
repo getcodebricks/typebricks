@@ -1,29 +1,35 @@
 import { PrimaryGeneratedColumn, PrimaryColumn, Entity, Column, Unique } from "typeorm";
 
+export interface IReadmodelInboxEntity {
+    id?: string;
+    no: number;
+    readmodelName: string;
+    streamName: string;
+    message: string;
+};
+
 @Entity()
 @Unique(['no', 'readmodelName', 'streamName'])
-abstract class ReadmodelInboxEntity {
-    @PrimaryGeneratedColumn("uuid")
+export abstract class ReadmodelInboxEntity {
+    @PrimaryGeneratedColumn('uuid', { name: 'id' })
     id: string;
 
-    @PrimaryColumn({ type: 'int' })
+    @PrimaryColumn({ name: 'no', type: 'int' })
     no: number;
 
-    @PrimaryColumn()
+    @PrimaryColumn({ name: 'readmodel_name' })
     readmodelName: string;
 
-    @PrimaryColumn()
+    @PrimaryColumn({ name: 'stream_name' })
     streamName: string;
 
-    @Column({type: 'text'})
+    @Column({ name: 'message', type: 'text' })
     message: string;
 
-    constructor(no: number, readmodelName: string, streamName: string, message: string) {
-        this.no = no;
-        this.readmodelName = readmodelName;
-        this.streamName = streamName;
-        this.message = message;
+    constructor(props: IReadmodelInboxEntity) {
+        this.no = props.no;
+        this.readmodelName = props.readmodelName;
+        this.streamName = props.streamName;
+        this.message = props.message;
     }
 }
-
-export { ReadmodelInboxEntity };
