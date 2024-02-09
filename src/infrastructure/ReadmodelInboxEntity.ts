@@ -26,10 +26,12 @@ export abstract class ReadmodelInboxEntity {
     @Column({ name: 'message', type: 'text' })
     message: string;
 
-    constructor(props: IReadmodelInboxEntity) {
-        this.no = props.no;
-        this.readmodelName = props.readmodelName;
-        this.streamName = props.streamName;
-        this.message = props.message;
+    constructor(props?: IReadmodelInboxEntity) {
+        if (props?.no && props?.readmodelName && props?.streamName && props?.message) {
+            this.no = props.no;
+            this.readmodelName = props.readmodelName;
+            this.streamName = props.streamName;
+            this.message = props.message;
+        }
     }
 }

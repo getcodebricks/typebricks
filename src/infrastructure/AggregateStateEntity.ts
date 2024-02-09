@@ -17,9 +17,11 @@ export abstract class AggregateStateEntity {
     @Column({ name: 'state', type: 'text'})
     state: string;
 
-    constructor(props: IAggregateStateEntity) {
-        this.aggregateId = props.aggregateId;
-        this.aggregateVersion = props.aggregateVersion;
-        this.state = props.state;
+    constructor(props?: IAggregateStateEntity) {
+        if (props?.aggregateId && props?.aggregateVersion && props?.state) {
+            this.aggregateId = props.aggregateId;
+            this.aggregateVersion = props.aggregateVersion;
+            this.state = props.state;
+        }
     }
 }

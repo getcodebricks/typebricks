@@ -23,8 +23,10 @@ export abstract class OutboxEntity {
     message: string;
 
     constructor(props: IOutboxEntity) {
-        this.no = props.no;
-        this.name = props.name;
-        this.message = props.message;
+        if (props?.no && props.name && props.message) {
+            this.no = props.no;
+            this.name = props.name;
+            this.message = props.message;
+        }
     }
 }

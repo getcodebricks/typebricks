@@ -29,11 +29,13 @@ export abstract class EventStreamEntity {
     @CreateDateColumn({ name: 'occurred_at', type: 'timestamptz' })
     occurredAt: Date;
 
-    constructor(props: IEventStreamEntity) {
-        this.aggregateId = props.aggregateId;
-        this.aggregateVersion = props.aggregateVersion;
-        this.name = props.name;
-        this.payload = props.payload;
-        this.occurredAt = props.occurredAt;
+    constructor(props?: IEventStreamEntity) {
+        if (props?.aggregateId && props?.aggregateVersion && props?.name && props?.payload && props?.occurredAt) {
+            this.aggregateId = props.aggregateId;
+            this.aggregateVersion = props.aggregateVersion;
+            this.name = props.name;
+            this.payload = props.payload;
+            this.occurredAt = props.occurredAt;
+        }
     }
 }

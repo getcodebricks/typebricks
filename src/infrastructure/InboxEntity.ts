@@ -26,10 +26,12 @@ export abstract class InboxEntity {
     @Column({ name: 'message', type: 'jsonb'})
     message: string;
 
-    constructor(props: IInboxEntity) {
-        this.no = props.no;
-        this.usecaseName = props.usecaseName;
-        this.streamName = props.streamName;
-        this.message = props.message;
+    constructor(props?: IInboxEntity) {
+        if (props?.no && props?.usecaseName && props?.streamName && props?.message) {
+            this.no = props.no;
+            this.usecaseName = props.usecaseName;
+            this.streamName = props.streamName;
+            this.message = props.message;
+        }
     }
 }

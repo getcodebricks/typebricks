@@ -26,9 +26,11 @@ export abstract class ReadmodelProjectionPositionEntity {
     @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
     updatedAt: Date;
 
-    constructor(props: IReadmodelProjectionPositionEntity) {
-        this.readmodelName = props.readmodelName;
-        this.streamName = props.streamName;
-        this.lastProjectedNo = props.lastProjectedNo;
+    constructor(props?: IReadmodelProjectionPositionEntity) {
+        if (props?.readmodelName && props?.readmodelName && props?.lastProjectedNo) {
+            this.readmodelName = props.readmodelName;
+            this.streamName = props.streamName;
+            this.lastProjectedNo = props.lastProjectedNo;
+        }
     }
 }
