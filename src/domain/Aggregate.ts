@@ -1,14 +1,10 @@
-import { Event, EventPayload } from "./Event";
+import { Event } from './Event';
 
-export interface AggregateState {
-  [index: string]: any;
-}
-
-export abstract class Aggregate<TState extends AggregateState> {
+export abstract class Aggregate<TState> {
     id: string;
     version: number;
     state: TState;
-    pendingEvents: Event<EventPayload>[];
+    pendingEvents: Event<any>[];
   
     constructor (id: string, version: number, state: TState) {
         this.id = id;
@@ -17,14 +13,14 @@ export abstract class Aggregate<TState extends AggregateState> {
         this.pendingEvents = [];
     }
 
-    abstract apply(event: Event<EventPayload>): TState | void;
+    abstract apply(event: Event<any>): TState | void;
 
-    addEvent(event: Event<EventPayload>): void {
+    addEvent(event: Event<any>): void {
         this.pendingEvents.push(event);
         this.applyEvent(event);
     }
 
-    applyEvent(event: Event<EventPayload>): void {
+    applyEvent(event: Event<any>): void {
         if (this.version != (event.aggregateVersion - 1)) {
             throw new Error(`can not apply event with aggregate version ${event.aggregateVersion} to aggregate with version ${this.version}`);
         }
@@ -37,8 +33,8 @@ export abstract class Aggregate<TState extends AggregateState> {
         this.version = event.aggregateVersion;
     }
 
-    loadFromHistory(events: Event<EventPayload>[]): void {
-        events.forEach((event: Event<EventPayload>) => {
+    loadFromHistory(events: Event<any>[]): void {
+        events.forEach((event: Event<any>) => {
             this.applyEvent(event);
         });
     }

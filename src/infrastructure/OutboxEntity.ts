@@ -22,8 +22,8 @@ export abstract class OutboxEntity {
     @Column({ name: 'message', type: 'text' })
     message: string;
 
-    constructor(props: IOutboxEntity) {
-        if (props?.no && props.name && props.message) {
+    constructor(props?: IOutboxEntity) {
+        if (props?.no && props?.name && props?.message) {
             this.no = props.no;
             this.name = props.name;
             this.message = props.message;
