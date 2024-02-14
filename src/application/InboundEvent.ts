@@ -4,6 +4,7 @@ export class InboundEvent<TPayload> {
         readonly no: number,
         readonly aggregateId: string,
         readonly aggregateVersion: number,
+        readonly name: string,
         readonly payload: TPayload,
         readonly occurredAt: Date
     ) {}
