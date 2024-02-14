@@ -1,8 +1,4 @@
-export interface InboundEventPayload {
-    [index: string]: any;
-}
-
-export class InboundEvent<TPayload extends InboundEventPayload> {
+export class InboundEvent<TPayload> {
     constructor(
         readonly streamName: string,
         readonly no: number,
