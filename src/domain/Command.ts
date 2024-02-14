@@ -1,11 +1,5 @@
-export interface CommandPayload {
-    [index: string]: any;
-}
-
-export abstract class Command<T extends CommandPayload> {
-    public readonly payload: T;
-
-    constructor (payload: T) {
+export abstract class Command<TCommandPayload> {
+    constructor (readonly payload: TCommandPayload) {
         this.payload = Object.freeze(payload);
     }
 }

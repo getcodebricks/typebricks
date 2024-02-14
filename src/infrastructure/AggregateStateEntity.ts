@@ -1,27 +1,27 @@
 import { PrimaryColumn, Entity, Column } from "typeorm";
 
+export interface IAggregateStateEntity {
+    aggregateId: string;
+    aggregateVersion: number;
+    state: string;
+};
+
 @Entity()
-abstract class AggregateStateEntity {
-    @PrimaryColumn()
+export abstract class AggregateStateEntity {
+    @PrimaryColumn({ name: 'aggregate_id' })
     aggregateId: string;
 
-    @Column({ type: 'int' })
+    @Column({ name: 'aggregate_version', type: 'int' })
     aggregateVersion: number;
 
-    @Column({type: 'text'})
+    @Column({ name: 'state', type: 'text'})
     state: string;
 
-    constructor(aggregateIdOrObject: string | any, aggregateVersion?: number, state?: string) {
-        if (typeof aggregateIdOrObject === 'object') {
-            this.aggregateId = aggregateIdOrObject?.aggregateId;
-            this.aggregateVersion = aggregateIdOrObject?.aggregateVersion;
-            this.state = aggregateIdOrObject?.state;
-        } else if (aggregateIdOrObject && aggregateVersion && state) {
-            this.aggregateId = aggregateIdOrObject;
-            this.aggregateVersion = aggregateVersion;
-            this.state = state;
+    constructor(props?: IAggregateStateEntity) {
+        if (props?.aggregateId && props?.aggregateVersion && props?.state) {
+            this.aggregateId = props.aggregateId;
+            this.aggregateVersion = props.aggregateVersion;
+            this.state = props.state;
         }
     }
 }
-
-export { AggregateStateEntity };

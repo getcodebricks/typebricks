@@ -1,29 +1,37 @@
 import { PrimaryGeneratedColumn, PrimaryColumn, Entity, Column, Unique } from "typeorm";
 
+export interface IInboxEntity {
+    id?: string;
+    no: number;
+    usecaseName: string;
+    streamName: string;
+    message: string;
+};
+
 @Entity()
 @Unique(['no', 'usecaseName', 'streamName'])
-abstract class InboxEntity {
-    @PrimaryGeneratedColumn("uuid")
+export abstract class InboxEntity {
+    @PrimaryGeneratedColumn('uuid', { name: 'id' })
     id: string;
 
-    @PrimaryColumn({ type: 'int' })
+    @PrimaryColumn({ name: 'no', type: 'int' })
     no: number;
 
-    @PrimaryColumn()
+    @PrimaryColumn({ name: 'usecase_name' })
     usecaseName: string;
 
-    @PrimaryColumn()
+    @PrimaryColumn({ name: 'stream_name' })
     streamName: string;
 
-    @Column({type: 'jsonb'})
+    @Column({ name: 'message', type: 'jsonb'})
     message: string;
 
-    constructor(no: number, usecaseName: string, streamName: string, message: string) {
-        this.no = no;
-        this.usecaseName = usecaseName;
-        this.streamName = streamName;
-        this.message = message;
+    constructor(props?: IInboxEntity) {
+        if (props?.no && props?.usecaseName && props?.streamName && props?.message) {
+            this.no = props.no;
+            this.usecaseName = props.usecaseName;
+            this.streamName = props.streamName;
+            this.message = props.message;
+        }
     }
 }
-
-export { InboxEntity };

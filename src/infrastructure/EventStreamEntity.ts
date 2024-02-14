@@ -1,41 +1,41 @@
 import { PrimaryGeneratedColumn, Entity, Column, CreateDateColumn } from "typeorm";
-import { Event } from "../domain/Event";
+
+export interface IEventStreamEntity {
+    no?: number;
+    aggregateId: string;
+    aggregateVersion: number;
+    name: string;
+    payload: string;
+    occurredAt: Date;
+};
 
 @Entity()
-abstract class EventStreamEntity {
-    @PrimaryGeneratedColumn()
+export abstract class EventStreamEntity {
+    @PrimaryGeneratedColumn({ name: 'no' })
     no: number;
 
-    @Column()
+    @Column({ name: 'aggregate_id' })
     aggregateId: string;
 
-    @Column({ type: 'int' })
+    @Column({ name: 'aggregate_version', type: 'int' })
     aggregateVersion: number;
 
-    @Column()
+    @Column({ name: 'name' })
     name: string;
 
-    @Column({type: 'text'})
+    @Column({ name: 'payload', type: 'text' })
     payload: string;
 
-    @CreateDateColumn({ type: 'timestamptz' })
+    @CreateDateColumn({ name: 'occurred_at', type: 'timestamptz' })
     occurredAt: Date;
 
-    constructor(aggregateIdOrObject: string | any, aggregateVersion?: number, name?: string, payload?: string, occurredAt?: Date) {
-        if (typeof aggregateIdOrObject === 'object') {
-            this.aggregateId = aggregateIdOrObject?.aggregateId;
-            this.aggregateVersion = aggregateIdOrObject?.aggregateVersion;
-            this.name = aggregateIdOrObject?.name;
-            this.payload = aggregateIdOrObject?.payload;
-            this.occurredAt = aggregateIdOrObject?.occurredAt;
-        } else if (aggregateIdOrObject && aggregateVersion && name && payload && occurredAt) {
-            this.aggregateId = aggregateIdOrObject;
-            this.aggregateVersion = aggregateVersion;
-            this.name = name;
-            this.payload = payload;
-            this.occurredAt = occurredAt;
+    constructor(props?: IEventStreamEntity) {
+        if (props?.aggregateId && props?.aggregateVersion && props?.name && props?.payload && props?.occurredAt) {
+            this.aggregateId = props.aggregateId;
+            this.aggregateVersion = props.aggregateVersion;
+            this.name = props.name;
+            this.payload = props.payload;
+            this.occurredAt = props.occurredAt;
         }
     }
 }
-
-export { EventStreamEntity };
