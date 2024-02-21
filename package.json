@@ -10,7 +10,7 @@
     ],
     "scripts": {
         "prebuild": "rm -Rf ./dist",
-        "build": "tsc",
+        "build": "tsc --project tsconfig.build.json",
         "postbuild": "npm run distPackage",
         "distPackage": "cp package.json ./dist/ && npx json -I -f ./dist/package.json -e 'this.scripts={}' -e 'this.private=false' ",
         "testAndMigrate": "npm run migration && mocha -r ts-node/register tests/**/*.test.ts -g 'bank account events'",
