@@ -6,7 +6,7 @@ import { OutboxEntity } from "./OutboxEntity";
 export class Publisher {
     readonly client: EventBridgeClient = new EventBridgeClient({});
 
-    constructor(readonly appDataSource: DataSource, readonly outBoxEntity: any, readonly aggregateName: string) {
+    constructor(readonly appDataSource: DataSource, readonly outBoxEntity: any, readonly aggregateName: string, readonly contextName: string) {
     }
 
     async initDataSource(): Promise<void> {
@@ -50,11 +50,12 @@ export class Publisher {
     }
 
     async sendEvent(name: string, message: string): Promise<boolean> {
+        const source: string = `${this.contextName}.${this.aggregateName}`;
         const published: PutEventsResponse = await this.client.send(
             new PutEventsCommand({
                 Entries: [{
                     EventBusName: String(process.env.EVENT_BUS_NAME),
-                    Source: this.aggregateName,
+                    Source: source,
                     DetailType: name,
                     Detail: message,
                 }],
