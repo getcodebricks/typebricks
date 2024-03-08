@@ -2,6 +2,7 @@ import { PrimaryGeneratedColumn, Entity, Column, CreateDateColumn } from "typeor
 
 export interface IEventStreamEntity {
     no?: number;
+    id: string;
     aggregateId: string;
     aggregateVersion: number;
     name: string;
@@ -13,6 +14,9 @@ export interface IEventStreamEntity {
 export abstract class EventStreamEntity {
     @PrimaryGeneratedColumn({ name: 'no' })
     no: number;
+
+    @Column({ name: 'id' })
+    id: string;
 
     @Column({ name: 'aggregate_id' })
     aggregateId: string;
@@ -30,7 +34,8 @@ export abstract class EventStreamEntity {
     occurredAt: Date;
 
     constructor(props?: IEventStreamEntity) {
-        if (props?.aggregateId && props?.aggregateVersion && props?.name && props?.payload && props?.occurredAt) {
+        if (props?.id && props?.aggregateId && props?.aggregateVersion && props?.name && props?.payload && props?.occurredAt) {
+            this.id = props.id;
             this.aggregateId = props.aggregateId;
             this.aggregateVersion = props.aggregateVersion;
             this.name = props.name;

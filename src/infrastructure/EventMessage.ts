@@ -3,6 +3,7 @@ import { gzip, ungzip } from "node-gzip";
 export interface IEventMessage {
     streamName: string;
     no: number;
+    id: string;
     aggregateId: string;
     aggregateVersion: number;
     name: string;
@@ -14,6 +15,7 @@ export interface IEventMessage {
 export class EventMessage {
     streamName: string;
     no: number;
+    id: string;
     aggregateId: string;
     aggregateVersion: number;
     name: string;
@@ -24,6 +26,7 @@ export class EventMessage {
     constructor (props: IEventMessage) {
         this.streamName = props.streamName;
         this.no = props.no;
+        this.id = props.id;
         this.aggregateId = props.aggregateId;
         this.aggregateVersion = props.aggregateVersion;
         this.name = props.name;
