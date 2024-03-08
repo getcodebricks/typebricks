@@ -1,14 +1,23 @@
+export interface EventProperties<TPayload> {
+    id: string;
+    aggregateId: string;
+    aggregateVersion: number;
+    name: string;
+    payload: TPayload;
+    occurredAt: Date;
+}
+
 export class Event <TPayload> {
-    constructor(readonly aggregateId: string, readonly aggregateVersion: number, readonly name: string, readonly payload: TPayload, readonly occurredAt: Date) {
-    }
+    constructor(readonly properties: EventProperties<TPayload>) {}
 
     object() {
         return {
-            aggregateId: this.aggregateId,
-            aggregateVersion: this.aggregateVersion,
-            name: this.name,
-            payload: JSON.stringify(this.payload),
-            occurredAt: this.occurredAt
+            id: this.properties.id,
+            aggregateId: this.properties.aggregateId,
+            aggregateVersion: this.properties.aggregateVersion,
+            name: this.properties.name,
+            payload: JSON.stringify(this.properties.payload),
+            occurredAt: this.properties.occurredAt
         }
     }
 }
