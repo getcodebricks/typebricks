@@ -12,12 +12,36 @@ export class Event <TPayload> {
 
     object() {
         return {
-            id: this.properties.id,
-            aggregateId: this.properties.aggregateId,
-            aggregateVersion: this.properties.aggregateVersion,
-            name: this.properties.name,
-            payload: JSON.stringify(this.properties.payload),
-            occurredAt: this.properties.occurredAt
+            id: this.id,
+            aggregateId: this.aggregateId,
+            aggregateVersion: this.aggregateVersion,
+            name: this.name,
+            payload: JSON.stringify(this.payload),
+            occurredAt: this.occurredAt
         }
+    }
+
+    get id(): string {
+        return this.properties.id;
+    }
+
+    get aggregateId(): string {
+        return this.properties.aggregateId;
+    }
+
+    get aggregateVersion(): number {
+        return this.properties.aggregateVersion;
+    }
+
+    get name(): string {
+        return this.properties.name;
+    }
+
+    get payload(): TPayload {
+        return this.properties.payload;
+    }
+
+    get occurredAt(): Date {
+        return this.properties.occurredAt;
     }
 }
