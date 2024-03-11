@@ -19,7 +19,7 @@ export class InboundEvent<TPayload> {
     payload: TPayload;
     occurredAt: Date;
 
-    constructor (readonly props: InboundEventProperties<TPayload>) {
+    constructor (props: InboundEventProperties<TPayload>) {
         this.streamName = props.streamName;
         this.no = props.no;
         this.id = props.id;
