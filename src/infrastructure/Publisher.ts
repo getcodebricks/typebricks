@@ -19,7 +19,7 @@ export class Publisher {
         }
     }
 
-    async publish(): Promise<void> {
+    async publish(): Promise<(EventMessage | undefined)[]> {
         await this.initDataSource();
         const outboxEvents: OutboxEntity[] = await this.appDataSource.manager.find(
             {
@@ -32,7 +32,7 @@ export class Publisher {
                 }
             }
         );
-        await Promise.all(outboxEvents.map(async (outboxEvent: OutboxEntity) => {
+        return await Promise.all(outboxEvents.map(async (outboxEvent: OutboxEntity) => {
             const inboxEventMessage: EventMessage = new EventMessage(JSON.parse(outboxEvent.message));
             const eventMessage: EventMessage = await inboxEventMessage.compressPayload();
             if (await this.sendEvent(eventMessage.name, JSON.stringify(eventMessage))) {
@@ -45,6 +45,7 @@ export class Publisher {
                         no: eventMessage.no
                     }
                 );
+                return inboxEventMessage;
             }
         }));
     }
