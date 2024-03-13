@@ -1,0 +1,30 @@
+image: node:20
+
+pipelines:
+  default:
+    - parallel:
+      - step:
+          name: Install dependencies
+          caches:
+            - node
+          script:
+            - npm install
+  branches:
+    master:
+      - step:
+          name: Build and Test
+          deployment: Production
+          caches:
+            - node
+          script:
+            - npm install
+            - npm run build
+          artifacts:
+            - dist/**
+      - step:
+          name: Deploy to Registry
+          script:
+            - pipe: atlassian/npm-publish:1.1.0
+              variables:
+                NPM_TOKEN: $NPM_TOKEN
+                FOLDER: dist
