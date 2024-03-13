@@ -27,4 +27,4 @@ pipelines:
             - pipe: atlassian/npm-publish:1.1.0
               variables:
                 NPM_TOKEN: $NPM_TOKEN
-                FOLDER: dist
+                FOLDER: ./dist
