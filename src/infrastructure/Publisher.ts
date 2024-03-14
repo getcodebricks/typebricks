@@ -1,12 +1,12 @@
 import { EventBridgeClient, PutEventsCommand, PutEventsResponse } from "@aws-sdk/client-eventbridge";
-import { DataSource } from "typeorm";
+import { DataSource, FindManyOptions, ObjectType } from "typeorm";
 import { EventMessage } from "./EventMessage";
 import { OutboxEntity } from "./OutboxEntity";
 
-export class Publisher {
+export class Publisher<T extends OutboxEntity> {
     readonly client: EventBridgeClient = new EventBridgeClient({});
 
-    constructor(readonly appDataSource: DataSource, readonly outBoxEntity: any, readonly aggregateName: string, readonly contextName: string) {
+    constructor(readonly appDataSource: DataSource, readonly outBoxEntity: ObjectType<T>, readonly aggregateName: string, readonly contextName: string) {
     }
 
     async initDataSource(): Promise<void> {
@@ -21,16 +21,14 @@ export class Publisher {
 
     async publish(): Promise<(EventMessage | undefined)[]> {
         await this.initDataSource();
-        const outboxEvents: OutboxEntity[] = await this.appDataSource.manager.find(
-            {
-                type: this.outBoxEntity,
-                name: this.outBoxEntity.name
-            },
-            {
-                order: {
-                    no: "ASC"
-                }
+        const findOptions: FindManyOptions<OutboxEntity> = {
+            order: {
+                no: "ASC"
             }
+        };
+        const outboxEvents: T[] = await this.appDataSource.manager.find(
+            this.outBoxEntity,
+            findOptions as FindManyOptions<T>
         );
         return await Promise.all(outboxEvents.map(async (outboxEvent: OutboxEntity) => {
             const inboxEventMessage: EventMessage = new EventMessage(JSON.parse(outboxEvent.message));
