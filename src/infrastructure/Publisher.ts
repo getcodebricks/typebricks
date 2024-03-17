@@ -1,5 +1,5 @@
 import { EventBridgeClient, PutEventsCommand, PutEventsResponse } from "@aws-sdk/client-eventbridge";
-import { DataSource, FindManyOptions, ObjectType } from "typeorm";
+import { DataSource, EntityManager, ObjectType } from "typeorm";
 import { EventMessage } from "./EventMessage";
 import { OutboxEntity } from "./OutboxEntity";
 
@@ -19,33 +19,31 @@ export class Publisher<T extends OutboxEntity> {
         }
     }
 
+
     async publish(): Promise<(EventMessage | undefined)[]> {
         await this.initDataSource();
-        const findOptions: FindManyOptions<OutboxEntity> = {
-            order: {
-                no: "ASC"
-            }
-        };
-        const outboxEvents: T[] = await this.appDataSource.manager.find(
-            this.outBoxEntity,
-            findOptions as FindManyOptions<T>
-        );
-        return await Promise.all(outboxEvents.map(async (outboxEvent: OutboxEntity) => {
-            const inboxEventMessage: EventMessage = new EventMessage(JSON.parse(outboxEvent.message));
-            const eventMessage: EventMessage = await inboxEventMessage.compressPayload();
-            if (await this.sendEvent(eventMessage.name, JSON.stringify(eventMessage))) {
-                await this.appDataSource.manager.delete(
-                    {
-                        type: this.outBoxEntity,
-                        name: this.outBoxEntity.name
-                    },
-                    {
-                        no: eventMessage.no
-                    }
-                );
-                return inboxEventMessage;
-            }
-        }));
+        await this.appDataSource.manager.transaction("READ COMMITTED", async (transactionalEntityManager: EntityManager) => {
+            const outboxEvents = await transactionalEntityManager
+                .getRepository(this.outBoxEntity)
+                .createQueryBuilder(this.outBoxEntity.name)
+                .setLock("pessimistic_write")
+                .setOnLocked("skip_locked")
+                .limit(10)
+                .getMany();
+
+            await Promise.all(outboxEvents.map(async (outboxEvent: T) => {
+                const inboxEventMessage: EventMessage = new EventMessage(JSON.parse(outboxEvent.message));
+                const eventMessage: EventMessage = inboxEventMessage;
+                if (!await this.sendEvent(eventMessage.name, JSON.stringify(eventMessage))) {
+                    throw new Error('failed to publish event meesage');
+                }
+            }));
+
+            await transactionalEntityManager
+                .getRepository(this.outBoxEntity)
+                .remove(outboxEvents);
+        });
+        return [];
     }
 
     async sendEvent(name: string, message: string): Promise<boolean> {
