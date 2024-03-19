@@ -78,7 +78,6 @@ export abstract class ReadmodelRepository<TInboxEntity extends ReadmodelInboxEnt
             });
             return lastProjectedNo + 1;
         } catch (error: any) {
-            console.log(error);
             return null;
         }
     }
