@@ -1,4 +1,5 @@
 import { EntityManager, FindOneOptions, FindManyOptions, DeleteResult, DataSource, BaseEntity } from "typeorm";
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { EventMessage } from "./EventMessage";
 import { IReadmodelInboxEntity, ReadmodelInboxEntity } from "./ReadmodelInboxEntity";
 import { IReadmodelProjectionPositionEntity, ReadmodelProjectionPositionEntity } from "./ReadmodelProjectionPositionEntity";
@@ -65,15 +66,17 @@ export abstract class ReadmodelRepository<TInboxEntity extends ReadmodelInboxEnt
                     } as TProjectionRepositoryMethods
                 );
 
+                const updatePositionEntry: QueryDeepPartialEntity<ReadmodelProjectionPositionEntity> = {
+                    readmodelName: readmodelName,
+                    streamName: streamName,
+                    lastProjectedNo: inboxEvent.no,
+                    updatedAt: new Date(),
+                };
                 await transactionalEntityManager
                     .getRepository(this.positionEntity)
-                    .save(
-                        new this.positionEntity({
-                            readmodelName: readmodelName,
-                            streamName: streamName,
-                            lastProjectedNo: inboxEvent.no,
-                            updatedAt: new Date(),
-                        }),
+                    .upsert(
+                        updatePositionEntry as QueryDeepPartialEntity<TPositionEntity>,
+                        ['readmodelName', 'streamName']
                     );
             });
             return lastProjectedNo + 1;
