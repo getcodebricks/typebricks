@@ -23,5 +23,8 @@ export * from './infrastructure/EventMessage'
 export * from './infrastructure/AggregateStateEntity'
 export * from './infrastructure/Publisher'
 export * from './infrastructure/PublisherTrigger'
+export * from './infrastructure/aws/ApiGateway'
+export * from './infrastructure/aws/SQS'
 export * from './utils/OverwriteProtectionDecorator'
 export * from './utils/shallowEqualObject'
+
