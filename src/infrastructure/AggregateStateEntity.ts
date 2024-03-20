@@ -1,4 +1,4 @@
-import { PrimaryColumn, Entity, Column } from "typeorm";
+import { PrimaryColumn, Entity, Column, Unique } from "typeorm";
 
 export interface IAggregateStateEntity {
     aggregateId: string;
@@ -8,7 +8,7 @@ export interface IAggregateStateEntity {
 
 @Entity()
 export abstract class AggregateStateEntity {
-    @PrimaryColumn({ name: 'aggregate_id' })
+    @PrimaryColumn({ name: 'aggregate_id', unique: true })
     aggregateId: string;
 
     @Column({ name: 'aggregate_version', type: 'int' })
