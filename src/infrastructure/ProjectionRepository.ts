@@ -1,6 +1,7 @@
 import { EntityManager, FindOneOptions, FindManyOptions, DeleteResult, DataSource, BaseEntity } from "typeorm";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { EventMessage } from "./EventMessage";
+import { NoInboxEventFoundError } from "./NoInboxEventFoundError";
 import { IProjectionInboxEntity, ProjectionInboxEntity } from "./ProjectionInboxEntity";
 import { IProjectionPositionEntity, ProjectionPositionEntity } from "./ProjectionPositionEntity";
 
@@ -50,8 +51,7 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
             await this.datasource.manager.transaction("READ COMMITTED", async (transactionalEntityManager: EntityManager) => {
                 const inboxEvent: TInboxEntity | null = await this.getFromInbox(transactionalEntityManager, projectionName, streamName, lastProjectedNo + 1);
                 if (!inboxEvent) {
-                    console.log(`No inbox event found for no ${lastProjectedNo + 1} of ${projectionName} and stream ${streamName}`);
-                    throw new Error(`No inbox event found for no ${lastProjectedNo + 1} of ${projectionName} and stream ${streamName}`);
+                    throw new NoInboxEventFoundError(`No inbox event found for no ${lastProjectedNo + 1} of ${projectionName} and stream ${streamName}`);
                 }
                 const inboxEventMessage: EventMessage = new EventMessage(JSON.parse(inboxEvent.message));
                 await projectMethod(
@@ -80,6 +80,9 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
             });
             return lastProjectedNo + 1;
         } catch (error: any) {
+            if (error instanceof NoInboxEventFoundError) {
+                return null;
+            }
             console.log(error);
             return null;
         }
@@ -144,7 +147,6 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
     }
 
     async updateOne(entityManager: EntityManager, projectedEntity: TProjectedEntity): Promise<TProjectedEntity | null> {
-        console.log(projectedEntity);
         return await entityManager.save(projectedEntity);
     }
 
