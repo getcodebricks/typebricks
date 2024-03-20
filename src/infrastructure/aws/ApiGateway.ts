@@ -115,3 +115,65 @@ export interface APIGatewayProxyEventMultiValueQueryStringParameters {
 export interface APIGatewayProxyEventStageVariables {
     [name: string]: string | undefined;
 }
+
+export interface APIGatewayTokenAuthorizerEvent {
+    type: "TOKEN";
+    methodArn: string;
+    authorizationToken: string;
+}
+
+export interface APIGatewayAuthorizerResult {
+    principalId: string;
+    policyDocument: PolicyDocument;
+    context?: APIGatewayAuthorizerResultContext | null | undefined;
+    usageIdentifierKey?: string | null | undefined;
+}
+
+export interface APIGatewayAuthorizerResultContext {
+    [name: string]: string | number | boolean | null | undefined;
+}
+
+
+export interface PolicyDocument {
+    Version: string;
+    Id?: string | undefined;
+    Statement: Statement[];
+}
+
+export type Statement = BaseStatement & StatementAction & (StatementResource | StatementPrincipal);
+
+export interface BaseStatement {
+    Effect: string;
+    Sid?: string | undefined;
+    Condition?: ConditionBlock | undefined;
+}
+
+export interface ConditionBlock {
+    [condition: string]: Condition | Condition[];
+}
+
+export interface Condition {
+    [key: string]: string | string[];
+}
+
+export type StatementAction = { Action: string | string[] } | { NotAction: string | string[] };
+
+export type StatementResource =
+    & MaybeStatementPrincipal
+    & ({ Resource: string | string[] } | { NotResource: string | string[] });
+
+export type StatementPrincipal =
+    & MaybeStatementResource
+    & ({ Principal: PrincipalValue } | { NotPrincipal: PrincipalValue });
+
+export interface MaybeStatementPrincipal {
+    Principal?: PrincipalValue | undefined;
+    NotPrincipal?: PrincipalValue | undefined;
+}
+
+export interface MaybeStatementResource {
+    Resource?: string | string[] | undefined;
+    NotResource?: string | string[] | undefined;
+}
+
+export type PrincipalValue = { [key: string]: string | string[] } | string | string[];
