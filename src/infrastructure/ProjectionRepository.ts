@@ -54,16 +54,22 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
                     throw new NoInboxEventFoundError(`No inbox event found for no ${lastProjectedNo + 1} of ${projectionName} and stream ${streamName}`);
                 }
                 const inboxEventMessage: EventMessage = new EventMessage(JSON.parse(inboxEvent.message));
-                await projectMethod(
-                    inboxEventMessage,
-                    {
-                        getOne: (findOneOptions: FindOneOptions) => this.getOne(transactionalEntityManager, findOneOptions),
-                        getMany: (findManyOptions: FindManyOptions) => this.getMany(transactionalEntityManager, findManyOptions),
-                        updateOne: (projectedEntity: TProjectedEntity) => this.updateOne(transactionalEntityManager, projectedEntity),
-                        updateMany: (projectedEntities: TProjectedEntity[]) => this.updateMany(transactionalEntityManager, projectedEntities),
-                        delete: (findManyOptions: FindManyOptions) => this.delete(transactionalEntityManager, findManyOptions)
-                    } as TProjectionRepositoryMethods
-                );
+                try {
+                    await projectMethod(
+                        inboxEventMessage,
+                        {
+                            getOne: (findOneOptions: FindOneOptions) => this.getOne(transactionalEntityManager, findOneOptions),
+                            getMany: (findManyOptions: FindManyOptions) => this.getMany(transactionalEntityManager, findManyOptions),
+                            updateOne: (projectedEntity: TProjectedEntity) => this.updateOne(transactionalEntityManager, projectedEntity),
+                            updateMany: (projectedEntities: TProjectedEntity[]) => this.updateMany(transactionalEntityManager, projectedEntities),
+                            delete: (findManyOptions: FindManyOptions) => this.delete(transactionalEntityManager, findManyOptions)
+                        } as TProjectionRepositoryMethods
+                    );
+                } catch (error: any) {
+                    if (!(error instanceof TypeError)) {
+                        throw error;
+                    }
+                }
 
                 const updatePositionEntry: QueryDeepPartialEntity<ProjectionPositionEntity> = {
                     projectionName: projectionName,
