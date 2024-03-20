@@ -1,10 +1,17 @@
 import { BaseEntity } from "typeorm";
 import { EventMessage } from "../infrastructure/EventMessage";
-import { IProjectionRepositoryMethods } from "../infrastructure/ReadmodelRepository";
+import { InboundEvent } from "./InboundEvent";
+import { IProjectionRepositoryMethods } from "../infrastructure/ProjectionRepository";
 
-export abstract class ReadmodelProjector<TReadModelEntity extends BaseEntity> {
-    abstract readmodelName: string;
-    abstract projectMethods: any ;
+export type ProjectMethod = (eventMessage: InboundEvent<any>, methods: IProjectionRepositoryMethods<any>) => Promise<void>;
+
+export type ProjectMethods = {
+    [key: string]: ProjectMethod;
+};
+
+export abstract class Projector<TProjectionEntity extends BaseEntity> {
+    abstract projectionName: string;
+    abstract projectMethods: ProjectMethods;
     abstract streamNames: string[];
 
     constructor(readonly repository: any) {
@@ -14,7 +21,7 @@ export abstract class ReadmodelProjector<TReadModelEntity extends BaseEntity> {
         const inboxEventMessage: EventMessage = eventMessage.compressed ? await eventMessage.uncompressPayload() : eventMessage;
         await this.repository.insertIntoInbox(
             inboxEventMessage.no,
-            this.readmodelName,
+            this.projectionName,
             inboxEventMessage.streamName,
             JSON.stringify(inboxEventMessage)
         );
@@ -24,9 +31,9 @@ export abstract class ReadmodelProjector<TReadModelEntity extends BaseEntity> {
         var keepProjecting: boolean = true;
         while (keepProjecting) {
             const lastProjectedNo: number | null = await this.repository.projectNextInboxEvent(
-                this.readmodelName,
+                this.projectionName,
                 this.streamNames[0],
-                async (eventMessage: EventMessage, methods: IProjectionRepositoryMethods<TReadModelEntity>) => {
+                async (eventMessage: EventMessage, methods: IProjectionRepositoryMethods<TProjectionEntity>) => {
                     const projectionMethod: string = `${this.streamNames[0]}.${eventMessage.name}`;
                     await this.projectMethods[projectionMethod](
                         {

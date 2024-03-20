@@ -1,21 +1,21 @@
 import { PrimaryGeneratedColumn, Entity, Column, UpdateDateColumn, Unique } from "typeorm";
 
-export interface IReadmodelProjectionPositionEntity {
+export interface IProjectionPositionEntity {
     id?: string;
-    readmodelName: string;
+    projectionName: string;
     streamName: string;
     lastProjectedNo: number;
     updatedAt: Date;
 }
 
 @Entity()
-@Unique(['readmodelName', 'streamName'])
-export abstract class ReadmodelProjectionPositionEntity {
+@Unique(['projectionName', 'streamName'])
+export abstract class ProjectionPositionEntity {
     @PrimaryGeneratedColumn('uuid', { name: 'id' })
     id: string;
 
-    @Column({ name: 'readmodel_name' })
-    readmodelName: string;
+    @Column({ name: 'projection_name' })
+    projectionName: string;
 
     @Column({ name: 'stream_name' })
     streamName: string;
@@ -26,9 +26,9 @@ export abstract class ReadmodelProjectionPositionEntity {
     @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
     updatedAt: Date;
 
-    constructor(props?: IReadmodelProjectionPositionEntity) {
-        if (props?.readmodelName && props?.readmodelName && props?.lastProjectedNo) {
-            this.readmodelName = props.readmodelName;
+    constructor(props?: IProjectionPositionEntity) {
+        if (props?.projectionName && props?.streamName && props?.lastProjectedNo) {
+            this.projectionName = props.projectionName;
             this.streamName = props.streamName;
             this.lastProjectedNo = props.lastProjectedNo;
         }
