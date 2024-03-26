@@ -7,7 +7,7 @@ import { EventMessage } from "./EventMessage";
 import { EventStreamEntity, IEventStreamEntity } from "./EventStreamEntity";
 import { IOutboxEntity, OutboxEntity } from "./OutboxEntity";
 
-export abstract class AggregateRepository<TAggregate extends Aggregate<any>, TEventStreamEntity extends EventStreamEntity, TOutBoxEntity extends OutboxEntity, TAggregateStateEntity extends AggregateStateEntity, TEventFactory extends EventFactory>{
+export abstract class AggregateRepository<TAggregate extends Aggregate<any>, TEventStreamEntity extends EventStreamEntity, TOutBoxEntity extends OutboxEntity, TAggregateStateEntity extends AggregateStateEntity, TEventFactory extends EventFactory> {
 
     protected constructor(
         readonly datasource: DataSource,
@@ -91,6 +91,9 @@ export abstract class AggregateRepository<TAggregate extends Aggregate<any>, TEv
             aggregateId,
             aggregateState?.aggregateVersion ?? 0
         );
+        if (!aggregateState && !rawEvents.length) {
+            return null
+        }
         const events: Event<any>[] = await this.parseRawEvents(rawEvents);
         const aggregate: TAggregate = new this.aggregate(aggregateId);
         if (aggregateState) {
