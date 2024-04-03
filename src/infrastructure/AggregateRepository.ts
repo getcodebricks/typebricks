@@ -7,7 +7,7 @@ import { EventMessage } from "./EventMessage";
 import { EventStreamEntity, IEventStreamEntity } from "./EventStreamEntity";
 import { IOutboxEntity, OutboxEntity } from "./OutboxEntity";
 
-export abstract class AggregateRepository<TAggregate extends Aggregate<any>, TEventStreamEntity extends EventStreamEntity, TOutBoxEntity extends OutboxEntity, TAggregateStateEntity extends AbstractAggregateStateEntity, TEventFactory extends EventFactory> {
+export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<any>, TEventStreamEntity extends EventStreamEntity, TOutBoxEntity extends OutboxEntity, TAggregateStateEntity extends AbstractAggregateStateEntity, TEventFactory extends EventFactory> {
 
     protected constructor(
         readonly datasource: DataSource,
