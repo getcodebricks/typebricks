@@ -1,13 +1,13 @@
 import { Between, DataSource, EntityManager, FindManyOptions, MoreThan, FindOneOptions } from "typeorm";
 import { Aggregate } from "../domain/Aggregate";
 import { Event } from "../domain/Event";
-import { AggregateStateEntity, IAggregateStateEntity } from "./AggregateStateEntity";
+import { AbstractAggregateStateEntity, IAggregateStateEntity } from "./AggregateStateEntity";
 import { EventFactory } from "./EventFactory";
 import { EventMessage } from "./EventMessage";
 import { EventStreamEntity, IEventStreamEntity } from "./EventStreamEntity";
 import { IOutboxEntity, OutboxEntity } from "./OutboxEntity";
 
-export abstract class AggregateRepository<TAggregate extends Aggregate<any>, TEventStreamEntity extends EventStreamEntity, TOutBoxEntity extends OutboxEntity, TAggregateStateEntity extends AggregateStateEntity, TEventFactory extends EventFactory> {
+export abstract class AggregateRepository<TAggregate extends Aggregate<any>, TEventStreamEntity extends EventStreamEntity, TOutBoxEntity extends OutboxEntity, TAggregateStateEntity extends AbstractAggregateStateEntity, TEventFactory extends EventFactory> {
 
     protected constructor(
         readonly datasource: DataSource,
@@ -106,7 +106,7 @@ export abstract class AggregateRepository<TAggregate extends Aggregate<any>, TEv
     }
 
     async getAggregateState(aggregateId: string): Promise<TAggregateStateEntity | null> {
-        const findOptions: FindOneOptions<AggregateStateEntity> = {
+        const findOptions: FindOneOptions<AbstractAggregateStateEntity> = {
             where: {
                 aggregateId: aggregateId
             }

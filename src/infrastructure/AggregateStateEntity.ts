@@ -7,7 +7,7 @@ export interface IAggregateStateEntity {
 };
 
 @Entity()
-export abstract class AggregateStateEntity {
+export abstract class AbstractAggregateStateEntity {
     @PrimaryColumn({ name: 'aggregate_id', unique: true })
     aggregateId: string;
 
