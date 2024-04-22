@@ -28,33 +28,34 @@ export abstract class Projector<TProjectionEntity extends BaseEntity> {
     }
 
     async projectFromInbox(): Promise<void> {
-        var keepProjecting: boolean = true;
-        while (keepProjecting) {
-            const lastProjectedNo: number | null = await this.repository.projectNextInboxEvent(
-                this.projectionName,
-                this.streamNames[0],
-                async (eventMessage: EventMessage, methods: IProjectionRepositoryMethods<TProjectionEntity>) => {
-                    const projectionMethod: string = `${this.streamNames[0]}.${eventMessage.name}`;
-                    await this.projectMethods[projectionMethod](
-                        {
-                            streamName: eventMessage.streamName,
-                            no: eventMessage.no,
-                            id: eventMessage.id,
-                            aggregateId: eventMessage.aggregateId,
-                            aggregateVersion: eventMessage.aggregateVersion,
-                            name: eventMessage.name,
-                            payload: JSON.parse(eventMessage.payload),
-                            occurredAt: eventMessage.occurredAt,
+        for (const streamName of this.streamNames) {
+            var keepProjecting: boolean = true;
+            while (keepProjecting) {
+                const lastProjectedNo: number | null = await this.repository.projectNextInboxEvent(
+                    this.projectionName,
+                    streamName,
+                    async (eventMessage: EventMessage, methods: IProjectionRepositoryMethods<TProjectionEntity>) => {
+                        const projectionMethod: string = `${streamName}.${eventMessage.name}`;
+                        await this.projectMethods[projectionMethod](
+                            {
+                                streamName: eventMessage.streamName,
+                                no: eventMessage.no,
+                                id: eventMessage.id,
+                                aggregateId: eventMessage.aggregateId,
+                                aggregateVersion: eventMessage.aggregateVersion,
+                                name: eventMessage.name,
+                                payload: JSON.parse(eventMessage.payload),
+                                occurredAt: eventMessage.occurredAt,
+                            },
+                            methods
+                        );
+                    }
+                );
 
-                        },
-                        methods
-                    );
+                if (!lastProjectedNo) {
+                    keepProjecting = false;
                 }
-            );
-
-            if (!lastProjectedNo) {
-                keepProjecting = false;
             }
-        };
+        }
     }
 }
