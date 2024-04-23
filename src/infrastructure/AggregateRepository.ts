@@ -20,10 +20,9 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
     ) {
     }
 
-    async save(aggregate: TAggregate): Promise<any> {
+    async save(aggregate: TAggregate): Promise<number> {
         try {
-            await this.datasource.manager.transaction(async (transactionalEntityManager: EntityManager) => {
-
+            const lastInsertedEventsNo: number = await this.datasource.manager.transaction<number>(async (transactionalEntityManager: EntityManager) => {
                 const findOptions: FindManyOptions<EventStreamEntity> = {
                     where: {
                         aggregateId: aggregate.id,
@@ -43,7 +42,7 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
                     throw new Error("Race condition while persisting aggregate.");
                 }
 
-                await Promise.all(aggregate.pendingEvents.map(async (pendingEvent: Event<any>) => {
+                const insertedEventsNos: number[] = await Promise.all(aggregate.pendingEvents.map(async (pendingEvent: Event<any>) => {
                     const event: TEventStreamEntity = new this.eventStreamEntity(pendingEvent);
                     const insertedEvent = await transactionalEntityManager.save(
                         this.eventStreamEntity,
@@ -68,7 +67,10 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
                         this.outBoxEntity,
                         outbox
                     );
+                    return insertedEvent.no;
                 }));
+
+                return Math.max(...insertedEventsNos);
             });
             aggregate.pendingEvents = [];
 
@@ -79,6 +81,7 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
                     state: JSON.stringify(aggregate.state)
                 })
             );
+            return lastInsertedEventsNo;
         } catch (error) {
             console.error('Error during transaction saving of Aggregate: ' + error);
             throw error;
