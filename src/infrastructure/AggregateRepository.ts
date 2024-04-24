@@ -22,6 +22,10 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
 
     async save(aggregate: TAggregate): Promise<number> {
         try {
+            if (aggregate.pendingEvents.length < 1) {
+                return await this.datasource.manager.getRepository(this.eventStreamEntity.name).maximum("no") ?? 0;
+            }
+
             const lastInsertedEventsNo: number = await this.datasource.manager.transaction<number>(async (transactionalEntityManager: EntityManager) => {
                 const findOptions: FindManyOptions<EventStreamEntity> = {
                     where: {
