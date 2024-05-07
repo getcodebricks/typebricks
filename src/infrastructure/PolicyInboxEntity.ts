@@ -1,24 +1,24 @@
 import { PrimaryGeneratedColumn, PrimaryColumn, Entity, Column, Unique } from "typeorm";
 
-export interface IInboxEntity {
+export interface IPolicyInboxEntity {
     id?: string;
     no: number;
-    usecaseName: string;
+    useCaseName: string;
     streamName: string;
     message: string;
 };
 
 @Entity()
-@Unique(['no', 'usecaseName', 'streamName'])
-export abstract class InboxEntity {
+@Unique(['no', 'useCaseName', 'streamName'])
+export abstract class PolicyInboxEntity {
     @PrimaryGeneratedColumn('uuid', { name: 'id' })
     id: string;
 
     @PrimaryColumn({ name: 'no', type: 'int' })
     no: number;
 
-    @PrimaryColumn({ name: 'usecase_name' })
-    usecaseName: string;
+    @PrimaryColumn({ name: 'use_case_name' })
+    useCaseName: string;
 
     @PrimaryColumn({ name: 'stream_name' })
     streamName: string;
@@ -26,10 +26,10 @@ export abstract class InboxEntity {
     @Column({ name: 'message', type: 'jsonb'})
     message: string;
 
-    constructor(props?: IInboxEntity) {
-        if (props?.no && props?.usecaseName && props?.streamName && props?.message) {
+    constructor(props?: IPolicyInboxEntity) {
+        if (props?.no && props?.useCaseName && props?.streamName && props?.message) {
             this.no = props.no;
-            this.usecaseName = props.usecaseName;
+            this.useCaseName = props.useCaseName;
             this.streamName = props.streamName;
             this.message = props.message;
         }
