@@ -7,7 +7,7 @@ export type ProcessMethods = {
     [key: string]: ProcessMethod;
 };
 
-export abstract class Processor{
+export abstract class Policy {
     abstract useCaseName: string;
     abstract processMethods: ProcessMethods;
     abstract streamNames: string[];
