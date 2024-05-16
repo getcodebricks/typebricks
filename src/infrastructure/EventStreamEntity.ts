@@ -11,7 +11,7 @@ export interface IEventStreamEntity {
 };
 
 @Entity()
-@Unique(['aggregate_id', 'aggregate_version'])
+@Unique(['aggregateId', 'aggregateVersion'])
 export abstract class EventStreamEntity {
     @PrimaryGeneratedColumn({ name: 'no' })
     no: number;
