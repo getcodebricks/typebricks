@@ -14,13 +14,13 @@ export abstract class ProjectionInboxEntity {
     @PrimaryGeneratedColumn('uuid', { name: 'id' })
     id: string;
 
-    @PrimaryColumn({ name: 'no', type: 'int' })
+    @Column({ name: 'no', type: 'int' })
     no: number;
 
-    @PrimaryColumn({ name: 'projection_name' })
+    @Column({ name: 'projection_name' })
     projectionName: string;
 
-    @PrimaryColumn({ name: 'stream_name' })
+    @Column({ name: 'stream_name' })
     streamName: string;
 
     @Column({ name: 'message', type: 'text' })

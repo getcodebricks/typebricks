@@ -1,12 +1,12 @@
 import { BaseEntity } from "typeorm";
 import { EventMessage } from "../infrastructure/EventMessage";
 import { InboundEvent } from "./InboundEvent";
-import { IProjectionRepositoryMethods } from "../infrastructure/ProjectionRepository";
-
-export type ProjectMethod = (eventMessage: InboundEvent<any>, methods: IProjectionRepositoryMethods<any>) => Promise<void>;
+import { IProjectionRepositoryMethods, ProjectionRepository } from "../infrastructure/ProjectionRepository";
+import { ProjectionInboxEntity } from "../infrastructure/ProjectionInboxEntity";
+import { ProjectionPositionEntity } from "../infrastructure/ProjectionPositionEntity";
 
 export type ProjectMethods = {
-    [key: string]: ProjectMethod;
+    [key: string]: (eventMessage: InboundEvent<any>, methods: IProjectionRepositoryMethods<any>) => Promise<void>;
 };
 
 export abstract class Projector<TProjectionEntity extends BaseEntity> {
@@ -14,7 +14,7 @@ export abstract class Projector<TProjectionEntity extends BaseEntity> {
     abstract projectMethods: ProjectMethods;
     abstract streamNames: string[];
 
-    constructor(readonly repository: any) {
+    constructor(readonly repository: ProjectionRepository<ProjectionInboxEntity, ProjectionPositionEntity, BaseEntity, IProjectionRepositoryMethods<any>>) {
     }
 
     async acceptIntoInbox(eventMessage: EventMessage): Promise<void> {

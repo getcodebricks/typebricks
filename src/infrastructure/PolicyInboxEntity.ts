@@ -1,4 +1,4 @@
-import { PrimaryGeneratedColumn, PrimaryColumn, Entity, Column, Unique } from "typeorm";
+import { PrimaryGeneratedColumn, Entity, Column, Unique } from "typeorm";
 
 export interface IPolicyInboxEntity {
     id?: string;
@@ -14,13 +14,13 @@ export abstract class PolicyInboxEntity {
     @PrimaryGeneratedColumn('uuid', { name: 'id' })
     id: string;
 
-    @PrimaryColumn({ name: 'no', type: 'int' })
+    @Column({ name: 'no', type: 'int' })
     no: number;
 
-    @PrimaryColumn({ name: 'use_case_name' })
+    @Column({ name: 'use_case_name' })
     useCaseName: string;
 
-    @PrimaryColumn({ name: 'stream_name' })
+    @Column({ name: 'stream_name' })
     streamName: string;
 
     @Column({ name: 'message', type: 'jsonb'})

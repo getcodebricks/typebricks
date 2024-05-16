@@ -1,10 +1,11 @@
 import { EventMessage } from "../infrastructure/EventMessage";
+import { PolicyInboxEntity } from "../infrastructure/PolicyInboxEntity";
+import { PolicyPositionEntity } from "../infrastructure/PolicyPositionEntity";
+import { PolicyRepository } from "../infrastructure/PolicyRepository";
 import { InboundEvent } from "./InboundEvent";
 
-export type ProcessMethod = (eventMessage: InboundEvent<any>) => Promise<void>;
-
 export type ProcessMethods = {
-    [key: string]: ProcessMethod;
+    [key: string]: (eventMessage: InboundEvent<any>) => Promise<void>;
 };
 
 export abstract class Policy {
@@ -12,7 +13,7 @@ export abstract class Policy {
     abstract processMethods: ProcessMethods;
     abstract streamNames: string[];
 
-    constructor(readonly repository: any) {
+    constructor(readonly repository: PolicyRepository<PolicyInboxEntity, PolicyPositionEntity>) {
     }
 
     async acceptIntoInbox(eventMessage: EventMessage): Promise<void> {

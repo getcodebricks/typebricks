@@ -1,4 +1,4 @@
-import { PrimaryGeneratedColumn, PrimaryColumn, Entity, Column, Unique } from "typeorm";
+import { PrimaryGeneratedColumn, Entity, Column, Unique } from "typeorm";
 
 export interface IOutboxEntity {
     id?: string;
@@ -13,7 +13,7 @@ export abstract class OutboxEntity {
     @PrimaryGeneratedColumn('uuid', { name: 'id' })
     id: string;
 
-    @PrimaryColumn({ name: 'no', type: 'int' })
+    @Column({ name: 'no', type: 'int' })
     no: number;
 
     @Column({ name: 'name' })
