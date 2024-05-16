@@ -1,8 +1,8 @@
-import { EventMessage } from "../infrastructure/EventMessage";
-import { PolicyInboxEntity } from "../infrastructure/PolicyInboxEntity";
-import { PolicyPositionEntity } from "../infrastructure/PolicyPositionEntity";
-import { PolicyRepository } from "../infrastructure/PolicyRepository";
-import { InboundEvent } from "./InboundEvent";
+import { EventMessage } from "../infrastructure/persistence/aggregate/EventMessage";
+import { PolicyInboxEntity } from "../infrastructure/consuming/PolicyInboxEntity";
+import { PolicyPositionEntity } from "../infrastructure/consuming/PolicyPositionEntity";
+import { PolicyRepository } from "../infrastructure/consuming/PolicyRepository";
+import { InboundEvent } from "./errors/InboundEvent";
 
 export type ProcessMethods = {
     [key: string]: (eventMessage: InboundEvent<any>) => Promise<void>;

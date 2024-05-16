@@ -1,6 +1,6 @@
 import { EntityManager, FindOneOptions, FindManyOptions, DeleteResult, DataSource, BaseEntity } from "typeorm";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
-import { EventMessage } from "./EventMessage";
+import { EventMessage } from "../persistence/aggregate/EventMessage";
 import { NoInboxEventFoundError } from "./NoInboxEventFoundError";
 import { IProjectionInboxEntity, ProjectionInboxEntity } from "./ProjectionInboxEntity";
 import { IProjectionPositionEntity, ProjectionPositionEntity } from "./ProjectionPositionEntity";

@@ -1,5 +1,5 @@
 import { EventStreamEntity } from "./EventStreamEntity";
-import { Event } from "../domain/Event";
+import { Event } from "../../../domain/Event";
 
 interface EventBuilder {
     [key: string]: (storedEvent: EventStreamEntity) => Event<any>;

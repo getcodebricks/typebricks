@@ -2,7 +2,7 @@ import { shallowEqual } from "shallow-equal-object";
 import { shallowEqualArrays } from "shallow-equal";
 
 export function shallowEqualObject(a: any, b: any) {
-    return shallowEqual(a, b, { debug: undefined, customEqual: customEqual });
+    return shallowEqual(a, b, { customEqual: customEqual });
 }
 
 function customEqual(x: any, y: any): boolean {
@@ -23,7 +23,7 @@ function customEqual(x: any, y: any): boolean {
             if (!(key in y)) {
                 return false;
             }
-            return shallowEqual(x[key], y[key], { debug: undefined, customEqual: customEqual });
+            return shallowEqual(x[key], y[key], { customEqual: customEqual });
         }
         return true;
     }

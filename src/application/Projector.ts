@@ -1,9 +1,9 @@
 import { BaseEntity } from "typeorm";
-import { EventMessage } from "../infrastructure/EventMessage";
-import { InboundEvent } from "./InboundEvent";
-import { IProjectionRepositoryMethods, ProjectionRepository } from "../infrastructure/ProjectionRepository";
-import { ProjectionInboxEntity } from "../infrastructure/ProjectionInboxEntity";
-import { ProjectionPositionEntity } from "../infrastructure/ProjectionPositionEntity";
+import { EventMessage } from "../infrastructure/persistence/aggregate/EventMessage";
+import { InboundEvent } from "./errors/InboundEvent";
+import { IProjectionRepositoryMethods, ProjectionRepository } from "../infrastructure/consuming/ProjectionRepository";
+import { ProjectionInboxEntity } from "../infrastructure/consuming/ProjectionInboxEntity";
+import { ProjectionPositionEntity } from "../infrastructure/consuming/ProjectionPositionEntity";
 
 export type ProjectMethods = {
     [key: string]: (eventMessage: InboundEvent<any>, methods: IProjectionRepositoryMethods<any>) => Promise<void>;

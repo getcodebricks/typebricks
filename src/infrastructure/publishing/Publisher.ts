@@ -1,6 +1,6 @@
 import { EventBridgeClient, PutEventsCommand, PutEventsResponse } from "@aws-sdk/client-eventbridge";
 import { DataSource, EntityManager, ObjectType } from "typeorm";
-import { EventMessage } from "./EventMessage";
+import { EventMessage } from "../persistence/aggregate/EventMessage";
 import { OutboxEntity } from "./OutboxEntity";
 
 export class Publisher<T extends OutboxEntity> {

@@ -1,11 +1,11 @@
 import { Between, DataSource, EntityManager, FindManyOptions, MoreThan, FindOneOptions } from "typeorm";
-import { Aggregate } from "../domain/Aggregate";
-import { Event } from "../domain/Event";
+import { Aggregate } from "../../../domain/Aggregate";
+import { Event } from "../../../domain/Event";
 import { AbstractAggregateStateEntity, IAggregateStateEntity } from "./AggregateStateEntity";
 import { EventFactory } from "./EventFactory";
 import { EventMessage } from "./EventMessage";
 import { EventStreamEntity, IEventStreamEntity } from "./EventStreamEntity";
-import { IOutboxEntity, OutboxEntity } from "./OutboxEntity";
+import { IOutboxEntity, OutboxEntity } from "../../publishing/OutboxEntity";
 
 export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<any>, TEventStreamEntity extends EventStreamEntity, TOutBoxEntity extends OutboxEntity, TAggregateStateEntity extends AbstractAggregateStateEntity, TEventFactory extends EventFactory> {
 
