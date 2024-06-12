@@ -37,13 +37,10 @@ deploy_npm:
         - build
     image: node:latest
     before_script:
-        - echo "@products:registry=http://${CI_SERVER_HOST}:${CI_SERVER_PORT}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/">.npmrc
-        - echo "//${CI_SERVER_HOST}:${CI_SERVER_PORT}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}">>.npmrc
-        # - echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}'>.npmrc
-        - npm config list
+        - npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
     script:
         - cd dist
-        - npm publish
+        - npm publish --verbose
     rules:
         # - if: '$CI_COMMIT_REF_NAME == "develop"'
         #   when: on_success
