@@ -11,24 +11,18 @@ stages:
     - build
     - deploy_npm
 
-variables:
-    BUCKET_NAME_LOGS: "code-client-logs"
-    BUCKET_NAME_APP: "code-client-app"
-
 build:
     stage: build
     environment:
         name: $ENVIRONMENT
     image: node:latest
     before_script:
-        - echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}'>.npmrc
-        - npm config list
         - npm i --omit=dev
     script:
         - npm run build
     artifacts:
         paths:
-            - build
+            - dist
     rules:
         # - if: '$CI_COMMIT_REF_NAME == "develop"'
         #   when: always
@@ -42,9 +36,11 @@ deploy_npm:
     dependencies:
         - build
     image: node:latest
+    before_script:
+        - npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
     script:
-        - cd build
-        - npm publish
+        - cd dist
+        - npm publish --verbose
     rules:
         # - if: '$CI_COMMIT_REF_NAME == "develop"'
         #   when: on_success
