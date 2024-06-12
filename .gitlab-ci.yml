@@ -11,10 +11,6 @@ stages:
     - build
     - deploy_npm
 
-variables:
-    BUCKET_NAME_LOGS: "code-client-logs"
-    BUCKET_NAME_APP: "code-client-app"
-
 build:
     stage: build
     environment:
@@ -41,7 +37,9 @@ deploy_npm:
         - build
     image: node:latest
     before_script:
-        - echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}'>.npmrc
+        - echo "@products:registry=http://${CI_SERVER_HOST}:${CI_SERVER_PORT}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/">.npmrc
+        - echo "//${CI_SERVER_HOST}:${CI_SERVER_PORT}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}">>.npmrc
+        # - echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}'>.npmrc
         - npm config list
     script:
         - cd dist
