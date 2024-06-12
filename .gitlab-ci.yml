@@ -28,7 +28,7 @@ build:
         - npm run build
     artifacts:
         paths:
-            - build
+            - dist
     rules:
         # - if: '$CI_COMMIT_REF_NAME == "develop"'
         #   when: always
@@ -43,7 +43,7 @@ deploy_npm:
         - build
     image: node:latest
     script:
-        - cd build
+        - cd dist
         - npm publish
     rules:
         # - if: '$CI_COMMIT_REF_NAME == "develop"'
