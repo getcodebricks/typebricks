@@ -21,8 +21,6 @@ build:
         name: $ENVIRONMENT
     image: node:latest
     before_script:
-        - echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}'>.npmrc
-        - npm config list
         - npm i --omit=dev
     script:
         - npm run build
@@ -42,6 +40,9 @@ deploy_npm:
     dependencies:
         - build
     image: node:latest
+    before_script:
+        - echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}'>.npmrc
+        - npm config list
     script:
         - cd dist
         - npm publish
