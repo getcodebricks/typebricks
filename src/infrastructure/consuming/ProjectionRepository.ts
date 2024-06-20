@@ -83,6 +83,15 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
                         updatePositionEntry as QueryDeepPartialEntity<TPositionEntity>,
                         ['projectionName', 'streamName']
                     );
+
+                await transactionalEntityManager
+                    .getRepository(this.inboxEntity)
+                    .createQueryBuilder(this.inboxEntity.name)
+                    .where('projection_name = :projectionName', { projectionName: projectionName })
+                    .andWhere('stream_name = :streamName', { streamName: streamName })
+                    .andWhere('no <= :no', { no: lastProjectedNo + 1 })
+                    .delete()
+                    .execute();
             });
             return lastProjectedNo + 1;
         } catch (error: any) {
