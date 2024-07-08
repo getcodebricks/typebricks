@@ -2,13 +2,13 @@ import { Projector } from "../../application/Projector";
 import { EventMessage } from "../persistence/aggregate/EventMessage";
 import { toSnakeCase } from "../../utils/toSnakeCase";
 
-class ReadmodelRecreator {
+class ProjectionRecreator {
     constructor(
         private readonly projector: Projector<any>,
     ) {
     }
 
-    async recreateReadmodel(): Promise<void> {
+    async recreateProjection(): Promise<void> {
         for (const streamName of this.projector.streamNames) {
             const eventStreamName: string = this.getEventStreamNameFromProjectorStreamName(streamName);
             await this.acceptEventsIntoInbox(eventStreamName, streamName);
@@ -52,4 +52,4 @@ class ReadmodelRecreator {
     }
 }
 
-export { ReadmodelRecreator };
+export { ProjectionRecreator };
