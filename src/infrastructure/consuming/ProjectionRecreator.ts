@@ -1,11 +1,9 @@
-import { DataSource } from "typeorm";
 import { Projector } from "../../application/Projector";
 import { EventMessage } from "../persistence/aggregate/EventMessage";
 import { toSnakeCase } from "../../utils/toSnakeCase";
 
 class ReadmodelRecreator {
     constructor(
-        private readonly datasource: DataSource,
         private readonly projector: Projector<any>,
     ) {
     }
@@ -33,7 +31,7 @@ class ReadmodelRecreator {
         var offset: number = 0;
         var continueFetching: boolean = true;
         while (continueFetching) {
-            const eventResult = await this.datasource.query(`SELECT * FROM ${eventStreamName} LIMIT 1 OFFSET ${offset};`);
+            const eventResult = await this.projector.repository.datasource.query(`SELECT * FROM ${eventStreamName} LIMIT 1 OFFSET ${offset};`);
             if (eventResult.length === 0) {
                 continueFetching = false;
             } else {
