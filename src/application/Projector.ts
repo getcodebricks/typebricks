@@ -20,7 +20,7 @@ export abstract class Projector<TProjectionEntity extends BaseEntity> {
     async acceptIntoInbox(eventMessage: EventMessage): Promise<void> {
         const inboxEventMessage: EventMessage = eventMessage.compressed ? await eventMessage.uncompressPayload() : eventMessage;
         await this.repository.insertIntoInbox(
-            inboxEventMessage.no,
+            inboxEventMessage.no!,
             this.projectionName,
             inboxEventMessage.streamName,
             JSON.stringify(inboxEventMessage)
@@ -39,7 +39,7 @@ export abstract class Projector<TProjectionEntity extends BaseEntity> {
                         await this.projectMethods[projectionMethod](
                             {
                                 streamName: eventMessage.streamName,
-                                no: eventMessage.no,
+                                no: eventMessage.no!,
                                 id: eventMessage.id,
                                 aggregateId: eventMessage.aggregateId,
                                 aggregateVersion: eventMessage.aggregateVersion,

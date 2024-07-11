@@ -2,7 +2,7 @@ import { gzip, ungzip } from "node-gzip";
 
 export interface IEventMessage {
     streamName: string;
-    no: number;
+    no?: number;
     id: string;
     aggregateId: string;
     aggregateVersion: number;
@@ -14,7 +14,7 @@ export interface IEventMessage {
 
 export class EventMessage {
     streamName: string;
-    no: number;
+    no?: number;
     id: string;
     aggregateId: string;
     aggregateVersion: number;

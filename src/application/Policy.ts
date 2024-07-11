@@ -19,7 +19,7 @@ export abstract class Policy {
     async acceptIntoInbox(eventMessage: EventMessage): Promise<void> {
         const inboxEventMessage: EventMessage = eventMessage.compressed ? await eventMessage.uncompressPayload() : eventMessage;
         await this.repository.insertIntoInbox(
-            inboxEventMessage.no,
+            inboxEventMessage.no!,
             this.useCaseName,
             inboxEventMessage.streamName,
             JSON.stringify(inboxEventMessage)
@@ -38,7 +38,7 @@ export abstract class Policy {
                         await this.processMethods[processionMethod](
                             {
                                 streamName: eventMessage.streamName,
-                                no: eventMessage.no,
+                                no: eventMessage.no!,
                                 id: eventMessage.id,
                                 aggregateId: eventMessage.aggregateId,
                                 aggregateVersion: eventMessage.aggregateVersion,
