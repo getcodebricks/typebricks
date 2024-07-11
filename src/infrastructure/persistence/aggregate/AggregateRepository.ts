@@ -1,11 +1,11 @@
 import { Between, DataSource, EntityManager, FindManyOptions, MoreThan, FindOneOptions } from "typeorm";
+import { EventStreamEntity, IEventStreamEntity } from "./EventStreamEntity";
+import { EventMessage } from "./EventMessage";
 import { Aggregate } from "../../../domain/Aggregate";
 import { Event } from "../../../domain/Event";
+import { IOutboxEntity, OutboxEntity } from "../../publishing/OutboxEntity";
 import { AbstractAggregateStateEntity, IAggregateStateEntity } from "./AggregateStateEntity";
 import { EventFactory } from "./EventFactory";
-import { EventMessage } from "./EventMessage";
-import { EventStreamEntity, IEventStreamEntity } from "./EventStreamEntity";
-import { IOutboxEntity, OutboxEntity } from "../../publishing/OutboxEntity";
 
 export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<any>, TEventStreamEntity extends EventStreamEntity, TOutBoxEntity extends OutboxEntity, TAggregateStateEntity extends AbstractAggregateStateEntity, TEventFactory extends EventFactory> {
 
@@ -20,13 +20,9 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
     ) {
     }
 
-    async save(aggregate: TAggregate): Promise<number> {
+    async save(aggregate: TAggregate): Promise<void> {
         try {
-            if (aggregate.pendingEvents.length < 1) {
-                return await this.datasource.manager.getRepository(this.eventStreamEntity.name).maximum("no") ?? 0;
-            }
-
-            const lastInsertedEventsNo: number = await this.datasource.manager.transaction<number>(async (transactionalEntityManager: EntityManager) => {
+            await this.datasource.manager.transaction(async (transactionalEntityManager: EntityManager) => {
                 const findOptions: FindManyOptions<EventStreamEntity> = {
                     where: {
                         aggregateId: aggregate.id,
@@ -46,15 +42,14 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
                     throw new Error("Race condition while persisting aggregate.");
                 }
 
-                const insertedEventsNos: number[] = await Promise.all(aggregate.pendingEvents.map(async (pendingEvent: Event<any>) => {
+                await Promise.all(aggregate.pendingEvents.map(async (pendingEvent: Event<any>) => {
                     const event: TEventStreamEntity = new this.eventStreamEntity(pendingEvent);
-                    const insertedEvent = await transactionalEntityManager.save(
+                    await transactionalEntityManager.save(
                         this.eventStreamEntity,
                         event
                     );
                     const eventMessage: EventMessage = new EventMessage({
                         streamName: this.streamName,
-                        no: insertedEvent.no,
                         id: pendingEvent.id,
                         aggregateId: pendingEvent.aggregateId,
                         aggregateVersion: pendingEvent.aggregateVersion,
@@ -63,7 +58,7 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
                         occurredAt: pendingEvent.occurredAt,
                     });
                     const outbox: TOutBoxEntity = new this.outBoxEntity({
-                        no: eventMessage.no,
+                        id: pendingEvent.id,
                         name: eventMessage.name,
                         message: JSON.stringify(eventMessage)
                     });
@@ -71,10 +66,7 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
                         this.outBoxEntity,
                         outbox
                     );
-                    return insertedEvent.no;
                 }));
-
-                return Math.max(...insertedEventsNos);
             });
             aggregate.pendingEvents = [];
 
@@ -85,7 +77,6 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
                     state: JSON.stringify(aggregate.state)
                 })
             );
-            return lastInsertedEventsNo;
         } catch (error) {
             console.error('Error during transaction saving of Aggregate: ' + error);
             throw error;

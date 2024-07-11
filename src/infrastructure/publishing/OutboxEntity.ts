@@ -1,20 +1,19 @@
-import { PrimaryGeneratedColumn, Entity, Column, Unique } from "typeorm";
+import { PrimaryGeneratedColumn, Entity, Column, PrimaryColumn } from "typeorm";
 
 export interface IOutboxEntity {
-    id?: string;
-    no: number;
+    id: string;
+    no?: number;
     name: string;
     message: string;
 };
 
 @Entity()
-@Unique(['no'])
 export abstract class OutboxEntity {
-    @PrimaryGeneratedColumn('uuid', { name: 'id' })
+    @PrimaryColumn('uuid', { name: 'id' })
     id: string;
 
-    @Column({ name: 'no', type: 'int' })
-    no: number;
+    @Column({ name: 'no', type: 'int', nullable: true})
+    no?: number;
 
     @Column({ name: 'name' })
     name: string;
@@ -23,7 +22,8 @@ export abstract class OutboxEntity {
     message: string;
 
     constructor(props?: IOutboxEntity) {
-        if (props?.no && props?.name && props?.message) {
+        if (props?.name && props?.name && props?.message) {
+            this.id = props.id;
             this.no = props.no;
             this.name = props.name;
             this.message = props.message;

@@ -1,8 +1,8 @@
-import { PrimaryGeneratedColumn, Entity, Column, CreateDateColumn, Unique } from "typeorm";
+import { Entity, Column, CreateDateColumn, Unique, PrimaryColumn } from "typeorm";
 
 export interface IEventStreamEntity {
-    no?: number;
     id: string;
+    no?: number;
     aggregateId: string;
     aggregateVersion: number;
     name: string;
@@ -13,11 +13,12 @@ export interface IEventStreamEntity {
 @Entity()
 @Unique(['aggregateId', 'aggregateVersion'])
 export abstract class EventStreamEntity {
-    @PrimaryGeneratedColumn({ name: 'no' })
-    no: number;
-
-    @Column({ name: 'id' })
+    
+    @PrimaryColumn({ name: 'id' })
     id: string;
+
+    @Column({ name: 'no', nullable: true})
+    no?: number;
 
     @Column({ name: 'aggregate_id' , type: 'uuid' })
     aggregateId: string;
@@ -37,6 +38,7 @@ export abstract class EventStreamEntity {
     constructor(props?: IEventStreamEntity) {
         if (props?.id && props?.aggregateId && props?.aggregateVersion && props?.name && props?.payload && props?.occurredAt) {
             this.id = props.id;
+            this.no = props.no;
             this.aggregateId = props.aggregateId;
             this.aggregateVersion = props.aggregateVersion;
             this.name = props.name;
