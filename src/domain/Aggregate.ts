@@ -5,12 +5,14 @@ export abstract class Aggregate<TState> {
     version: number;
     state: TState;
     pendingEvents: Event<any>[];
+    changedAt: Date;
   
     constructor (id: string, version: number, state: TState) {
         this.id = id;
         this.version = version;
         this.state = state;
         this.pendingEvents = [];
+        this.changedAt = new Date();
     }
 
     abstract apply(event: Event<any>): TState | void;
@@ -31,6 +33,7 @@ export abstract class Aggregate<TState> {
         }
         this.state = newState;
         this.version = event.aggregateVersion;
+        this.changedAt = event.occurredAt;
     }
 
     loadFromHistory(events: Event<any>[]): void {
