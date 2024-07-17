@@ -9,7 +9,7 @@ export interface IPolicyPositionEntity {
 }
 
 /**
- * Persists current position of the policy for each steam.
+ * Persists current position of the policy for each stream.
  * 
  * * Demos: 
  * 
