@@ -26,7 +26,7 @@ export class Publisher<T extends OutboxEntity> {
     }
 
     private async setSequenceNumbers() {
-        await this.appDataSource.manager.transaction("READ COMMITTED", async (transactionalEntityManager: EntityManager) => {
+        await this.appDataSource.manager.transaction(async (transactionalEntityManager: EntityManager) => {
             const events = await transactionalEntityManager
                 .getRepository(this.eventStreamEntity)
                 .createQueryBuilder('events')
@@ -71,6 +71,7 @@ export class Publisher<T extends OutboxEntity> {
                 .createQueryBuilder(this.outBoxEntity.name)
                 .setLock("pessimistic_write")
                 .setOnLocked("skip_locked")
+                .where('no is not null')
                 .limit(10)
                 .getMany();
 
