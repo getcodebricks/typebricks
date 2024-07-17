@@ -2,7 +2,7 @@ import { EventMessage } from "../infrastructure/persistence/aggregate/EventMessa
 import { PolicyInboxEntity } from "../infrastructure/consuming/PolicyInboxEntity";
 import { PolicyPositionEntity } from "../infrastructure/consuming/PolicyPositionEntity";
 import { PolicyRepository } from "../infrastructure/consuming/PolicyRepository";
-import { InboundEvent } from "./errors/InboundEvent";
+import { InboundEvent } from "./InboundEvent";
 
 export type ProcessMethods = {
     [key: string]: (eventMessage: InboundEvent<any>) => Promise<void>;

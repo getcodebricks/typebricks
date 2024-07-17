@@ -1,6 +1,6 @@
 import { BaseEntity } from "typeorm";
 import { EventMessage } from "../infrastructure/persistence/aggregate/EventMessage";
-import { InboundEvent } from "./errors/InboundEvent";
+import { InboundEvent } from "./InboundEvent";
 import { IProjectionRepositoryMethods, ProjectionRepository } from "../infrastructure/consuming/ProjectionRepository";
 import { ProjectionInboxEntity } from "../infrastructure/consuming/ProjectionInboxEntity";
 import { ProjectionPositionEntity } from "../infrastructure/consuming/ProjectionPositionEntity";

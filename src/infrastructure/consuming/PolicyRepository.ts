@@ -1,7 +1,7 @@
 import { EntityManager, FindOneOptions, DataSource } from "typeorm";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { EventMessage } from "../persistence/aggregate/EventMessage";
-import { NoInboxEventFoundError } from "./NoInboxEventFoundError";
+import { NoInboxEventFoundError } from "./errors/NoInboxEventFoundError";
 import { IPolicyPositionEntity, PolicyPositionEntity } from "./PolicyPositionEntity";
 import { IPolicyInboxEntity, PolicyInboxEntity } from "./PolicyInboxEntity";
 
