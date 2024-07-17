@@ -45,14 +45,14 @@ export abstract class Aggregate<TState> {
     /**
      * Maps events to their apply methods.
      * 
-     * @param event Event to apply on aggregate
+     * @param event - Event to apply on aggregate
      */
     abstract apply(event: Event<any>): TState | void;
 
     /**
      * Add event to be persisted and applied to aggregate.
      * 
-     * @param event Added Event
+     * @param event - Added Event
      */
     addEvent(event: Event<any>): void {
         this.pendingEvents.push(event);
@@ -65,7 +65,7 @@ export abstract class Aggregate<TState> {
      * - increate version
      * - set changed at
      * 
-     * @param event Event to apply on aggregate 
+     * @param event - Event to apply on aggregate 
      */
     applyEvent(event: Event<any>): void {
         if (this.version != (event.aggregateVersion - 1)) {
@@ -84,7 +84,7 @@ export abstract class Aggregate<TState> {
     /**
      * Load aggregate via its event history.
      * 
-     * @param events Aggregates event history
+     * @param events - Aggregates event history
      */
     loadFromHistory(events: Event<any>[]): void {
         events.forEach((event: Event<any>) => {
