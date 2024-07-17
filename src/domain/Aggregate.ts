@@ -5,7 +5,7 @@ import { Event } from './Event';
  * 
  * Demos: 
  * 
- * - [Command API](https://getcodebricks.com/docs/fundamentals)
+ * - [Command API](https://getcodebricks.com/docs/fundamentals/command-api)
  * 
  * API: 
  * 
@@ -34,6 +34,13 @@ export abstract class Aggregate<TState> {
      */
     changedAt: Date;
   
+    /**
+     * Initializes Aggregate
+     * 
+     * @param id - Aggregate's id 
+     * @param version - Aggregate's version 
+     * @param state - Aggregate's state 
+     */
     constructor (id: string, version: number, state: TState) {
         this.id = id;
         this.version = version;

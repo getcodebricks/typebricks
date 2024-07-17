@@ -9,14 +9,34 @@ export type ProjectMethods = {
     [key: string]: (eventMessage: InboundEvent<any>, methods: IProjectionRepositoryMethods<any>) => Promise<void>;
 };
 
+
+/**
+ * Handles projecting of consumed events. 
+ * 
+ * Demos: 
+ * 
+ * - [Consuming](https://getcodebricks.com/docs/consuming)
+ * 
+ */
 export abstract class Projector<TProjectionEntity extends BaseEntity> {
     abstract projectionName: string;
     abstract projectMethods: ProjectMethods;
     abstract streamNames: string[];
 
+     /**
+     * Initializes Projector
+     * 
+     * @param repository - Projector's repository
+     */
     constructor(readonly repository: ProjectionRepository<ProjectionInboxEntity, ProjectionPositionEntity, BaseEntity, IProjectionRepositoryMethods<any>>) {
     }
 
+    /**
+     * Accepts event, decompresses it and passes it to the repository to persist.
+     * 
+     * @param eventMessage
+     * @returns 
+     */
     async acceptIntoInbox(eventMessage: EventMessage): Promise<void> {
         const inboxEventMessage: EventMessage = eventMessage.compressed ? await eventMessage.uncompressPayload() : eventMessage;
         await this.repository.insertIntoInbox(
@@ -27,6 +47,11 @@ export abstract class Projector<TProjectionEntity extends BaseEntity> {
         );
     }
 
+    /**
+     * Projects events from all streams until there is none left in the inbox.
+     * 
+     * @returns
+     */
     async projectFromInbox(): Promise<void> {
         for (const streamName of this.streamNames) {
             var keepProjecting: boolean = true;

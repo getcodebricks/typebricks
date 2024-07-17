@@ -19,8 +19,8 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
      * Initializes PolicyRepository.
      * 
      * @param datasource - Typeorm DataSource
-     * @param inboxEntity - Policy's inbox entity
-     * @param positionEntity - Policy's position entity
+     * @param inboxEntity - Policy's inbox Typeorm entity
+     * @param positionEntity - Policy's position Typeorm entity
      */
     protected constructor(
         readonly datasource: DataSource,

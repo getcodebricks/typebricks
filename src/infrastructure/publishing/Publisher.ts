@@ -3,12 +3,40 @@ import { DataSource, EntityManager, ObjectType } from "typeorm";
 import { OutboxEntity } from "./OutboxEntity";
 import { EventMessage } from "../persistence/aggregate/EventMessage";
 
+/**
+ * Publishes events to the eventbridge from the outbox.
+ * 
+ * * Demos: 
+ * 
+ * - [Publishing](https://getcodebricks.com/docs/publishing)
+ * 
+ */
 export class Publisher<T extends OutboxEntity> {
-    readonly client: EventBridgeClient = new EventBridgeClient({});
 
-    constructor(readonly appDataSource: DataSource, readonly eventStreamEntity: ObjectType<T>, readonly outBoxEntity: ObjectType<T>, readonly aggregateName: string, readonly contextName: string) {
+    /**
+     * Initializes Publisher
+     * 
+     * @param appDataSource - Typeorm datasource
+     * @param eventStreamEntity - Event stream Typeorm entity
+     * @param outBoxEntity - Event outbox Typeorm entity
+     * @param aggregateName - Aggregate's name
+     * @param contextName - Context's name
+     * @param client - Eventbridge client
+     */
+    constructor(
+        readonly appDataSource: DataSource,
+        readonly eventStreamEntity: ObjectType<T>,
+        readonly outBoxEntity: ObjectType<T>,
+        readonly aggregateName: string,
+        readonly contextName: string,
+        readonly client: EventBridgeClient = new EventBridgeClient({})
+    ) {
     }
 
+    /**
+     * Publishes events from outbox. 
+     * @returns
+     */
     async publish(): Promise<void> {
         await this.initDataSource();
         await this.setSequenceNumbers();

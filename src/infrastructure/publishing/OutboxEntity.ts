@@ -7,6 +7,14 @@ export interface IOutboxEntity {
     message: string;
 };
 
+/**
+ * Saves persisted events for publishing. 
+ * 
+ * * Demos: 
+ * 
+ * - [Publishing](https://getcodebricks.com/docs/publishing)
+ * 
+ */
 @Entity()
 export abstract class OutboxEntity {
     @PrimaryColumn('uuid', { name: 'id' })

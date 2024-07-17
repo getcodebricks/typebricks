@@ -27,9 +27,9 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
      * Initializes ProjectionRepository
      * 
      * @param datasource - Typeorm DataSource
-     * @param inboxEntity - Projection's inbox entity
-     * @param positionEntity - Projection's position entity 
-     * @param projectedEntity - Projection's database entity
+     * @param inboxEntity - Projection's inbox Typeorm entity
+     * @param positionEntity - Projection's position Typeorm entity 
+     * @param projectedEntity - Projection's Typeorm  entity
      */
     protected constructor(
         readonly datasource: DataSource,
