@@ -8,6 +8,9 @@ class ProjectionRecreator {
     ) {
     }
 
+    /**
+     * Recreate projection from the start of the eventstream.
+     */
     async recreateProjection(): Promise<void> {
         for (const streamName of this.projector.streamNames) {
             const eventStreamName: string = this.getEventStreamNameFromProjectorStreamName(streamName);
