@@ -8,6 +8,14 @@ export interface IProjectionPositionEntity {
     updatedAt: Date;
 }
 
+/**
+ * Persists current position of the projection for each stream.
+ * 
+ * * Demos: 
+ * 
+ * - [Consuming](https://getcodebricks.com/docs/consuming)
+ * 
+ */
 @Entity()
 @Unique(['projectionName', 'streamName'])
 export abstract class ProjectionPositionEntity {

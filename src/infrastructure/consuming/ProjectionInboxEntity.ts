@@ -8,6 +8,14 @@ export interface IProjectionInboxEntity {
     message: string;
 };
 
+/**
+ * Saves incoming events for projections. 
+ * 
+ * * Demos: 
+ * 
+ * - [Consuming](https://getcodebricks.com/docs/consuming)
+ * 
+ */
 @Entity()
 @Unique(['no', 'projectionName', 'streamName'])
 export abstract class ProjectionInboxEntity {
