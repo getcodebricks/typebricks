@@ -1,12 +1,27 @@
 import { EntityManager, FindOneOptions, DataSource } from "typeorm";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { EventMessage } from "../persistence/aggregate/EventMessage";
-import { NoInboxEventFoundError } from "./NoInboxEventFoundError";
+import { NoInboxEventFoundError } from "./errors/NoInboxEventFoundError";
 import { IPolicyPositionEntity, PolicyPositionEntity } from "./PolicyPositionEntity";
 import { IPolicyInboxEntity, PolicyInboxEntity } from "./PolicyInboxEntity";
 
+/**
+ * Persists incoming events from inbox and processes events from inbox.
+ * 
+ * Demos: 
+ * 
+ * - [Consuming](https://getcodebricks.com/docs/consuming)
+ * 
+ */
 export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, TPositionEntity extends PolicyPositionEntity> {
 
+    /**
+     * Initializes PolicyRepository.
+     * 
+     * @param datasource - Typeorm DataSource
+     * @param inboxEntity - Policy's inbox Typeorm entity
+     * @param positionEntity - Policy's position Typeorm entity
+     */
     protected constructor(
         readonly datasource: DataSource,
         readonly inboxEntity: new (params: IPolicyInboxEntity) => TInboxEntity,
@@ -14,6 +29,15 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
     ) {
     }
 
+    /**
+     * Inserts event into Policy's inbox.
+     * 
+     * @param no - Event no
+     * @param useCaseName - Policy name
+     * @param streamName - Consumed stream name
+     * @param message - Event message
+     * @returns 
+     */
     async insertIntoInbox(no: number, useCaseName: string, streamName: string, message: string): Promise<void> {
         try {
             const projectionInboxEntity: TInboxEntity = new this.inboxEntity({
@@ -31,7 +55,15 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
         }
     }
 
-
+    /**
+     * Gets next inbox event according to the position and passes it to callback process method. 
+     * Increases policy's position afterwards and deletes the processed inbox events.
+     * 
+     * @param useCaseName - Policy name
+     * @param streamName - Consumed stream name
+     * @param processMethod - Callback process method
+     * @returns Last processed event no.
+     */
     async processNextInboxEvent(useCaseName: string, streamName: string, processMethod: (eventMessage: EventMessage) => Promise<void>): Promise<number | null> {
         try {
             const lastProcessedNo: number | null = await this.getPolicyPosition(this.datasource.manager, useCaseName, streamName);
@@ -46,27 +78,14 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
                 }
                 const inboxEventMessage: EventMessage = new EventMessage(JSON.parse(inboxEvent.message));
                 try {
-                    await processMethod(
-                        inboxEventMessage,
-                    );
+                    await processMethod(inboxEventMessage);
                 } catch (error: any) {
                     if (!(error instanceof TypeError)) {
                         throw error;
                     }
                 }
-
-                const updatePositionEntry: QueryDeepPartialEntity<PolicyPositionEntity> = {
-                    useCaseName: useCaseName,
-                    streamName: streamName,
-                    lastProcessedNo: inboxEvent.no,
-                    updatedAt: new Date(),
-                };
-                await transactionalEntityManager
-                    .getRepository(this.positionEntity)
-                    .upsert(
-                        updatePositionEntry as QueryDeepPartialEntity<TPositionEntity>,
-                        ['useCaseName', 'streamName']
-                    );
+                await this.updatePolicyPosition(transactionalEntityManager, useCaseName, streamName, inboxEvent.no);
+                await this.deleteInboxEntriesUntil(transactionalEntityManager, useCaseName, streamName, lastProcessedNo);
             });
             return lastProcessedNo + 1;
         } catch (error: any) {
@@ -78,7 +97,7 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
         }
     }
 
-    async getFromInbox(entityManager: EntityManager, useCaseName: string, streamName: string, no: number): Promise<TInboxEntity | null> {
+    private async getFromInbox(entityManager: EntityManager, useCaseName: string, streamName: string, no: number): Promise<TInboxEntity | null> {
         return await entityManager
             .getRepository(this.inboxEntity)
             .createQueryBuilder(this.inboxEntity.name)
@@ -90,7 +109,7 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
             .getOne();
     }
 
-    async getPolicyPosition(entityManager: EntityManager, useCaseName: string, streamName: string): Promise<number | null> {
+    private async getPolicyPosition(entityManager: EntityManager, useCaseName: string, streamName: string): Promise<number | null> {
         try {
             const findOptions: FindOneOptions<PolicyPositionEntity> = {
                 where: {
@@ -109,22 +128,29 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
         }
     }
 
-    async updatePolicyPosition(entityManager: EntityManager, no: number, useCaseName: string, streamName: string, message: string): Promise<boolean> {
-        try {
-            await entityManager
-                .getRepository(this.positionEntity)
-                .save(
-                    new this.positionEntity({
-                        useCaseName: useCaseName,
-                        streamName: streamName,
-                        lastProcessedNo: no,
-                        updatedAt: new Date(),
-                    }),
-                );
-            return true;
-        } catch (error: any) {
-            console.log(error);
-            return false;
-        }
+    private async updatePolicyPosition(transactionalEntityManager: EntityManager, useCaseName: string, streamName: string, no: number): Promise<void> {
+        const updatePositionEntry: QueryDeepPartialEntity<PolicyPositionEntity> = {
+            useCaseName: useCaseName,
+            streamName: streamName,
+            lastProcessedNo: no,
+            updatedAt: new Date(),
+        };
+        await transactionalEntityManager
+            .getRepository(this.positionEntity)
+            .upsert(
+                updatePositionEntry as QueryDeepPartialEntity<TPositionEntity>,
+                ['useCaseName', 'streamName']
+            );
+    }
+
+    private async deleteInboxEntriesUntil(transactionalEntityManager: EntityManager, useCaseName: string, streamName: string, lastProcessedNo: number) {
+        await transactionalEntityManager
+            .getRepository(this.inboxEntity)
+            .createQueryBuilder(this.inboxEntity.name)
+            .where('use_case_name = :useCaseName', { useCaseName: useCaseName })
+            .andWhere('stream_name = :streamName', { streamName: streamName })
+            .andWhere('no <= :no', { no: lastProcessedNo + 1 })
+            .delete()
+            .execute();
     }
 }

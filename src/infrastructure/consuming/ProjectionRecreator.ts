@@ -2,12 +2,30 @@ import { Projector } from "../../application/Projector";
 import { EventMessage } from "../persistence/aggregate/EventMessage";
 import { toSnakeCase } from "../../utils/toSnakeCase";
 
+/**
+ * Recreates a projection from the start of the eventstream
+ * 
+ * Demos: 
+ * 
+ * - [Receating](https://getcodebricks.com/docs/recreating)
+ * 
+ */
 class ProjectionRecreator {
+    
+    /**
+     * Initializes ProjectionRecreator
+     * 
+     * @param projector - Projection's projector
+     */
     constructor(
         private readonly projector: Projector<any>,
     ) {
     }
 
+    /**
+     * Recreate projection from the start of the eventstream.
+     * @returns 
+     */
     async recreateProjection(): Promise<void> {
         for (const streamName of this.projector.streamNames) {
             const eventStreamName: string = this.getEventStreamNameFromProjectorStreamName(streamName);

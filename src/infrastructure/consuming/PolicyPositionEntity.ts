@@ -8,6 +8,14 @@ export interface IPolicyPositionEntity {
     updatedAt: Date;
 }
 
+/**
+ * Persists current position of the policy for each stream.
+ * 
+ * * Demos: 
+ * 
+ * - [Consuming](https://getcodebricks.com/docs/consuming)
+ * 
+ */
 @Entity()
 @Unique(['useCaseName', 'streamName'])
 export abstract class PolicyPositionEntity {

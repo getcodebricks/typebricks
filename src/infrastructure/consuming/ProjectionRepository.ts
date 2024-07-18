@@ -1,7 +1,7 @@
 import { EntityManager, FindOneOptions, FindManyOptions, DeleteResult, DataSource, BaseEntity } from "typeorm";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { EventMessage } from "../persistence/aggregate/EventMessage";
-import { NoInboxEventFoundError } from "./NoInboxEventFoundError";
+import { NoInboxEventFoundError } from "./errors/NoInboxEventFoundError";
 import { IProjectionInboxEntity, ProjectionInboxEntity } from "./ProjectionInboxEntity";
 import { IProjectionPositionEntity, ProjectionPositionEntity } from "./ProjectionPositionEntity";
 
@@ -13,8 +13,24 @@ export interface IProjectionRepositoryMethods<TProjectedEntity> {
     delete: (findManyOptions: FindManyOptions) => Promise<number | null | undefined>;
 }
 
+/**
+ * Persists incoming events from inbox and projects events from inbox.
+ * 
+ * Demos: 
+ * 
+ * - [Consuming](https://getcodebricks.com/docs/consuming)
+ * 
+ */
 export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxEntity, TPositionEntity extends ProjectionPositionEntity, TProjectedEntity extends BaseEntity, TProjectionRepositoryMethods extends IProjectionRepositoryMethods<TProjectedEntity>> {
 
+    /**
+     * Initializes ProjectionRepository
+     * 
+     * @param datasource - Typeorm DataSource
+     * @param inboxEntity - Projection's inbox Typeorm entity
+     * @param positionEntity - Projection's position Typeorm entity 
+     * @param projectedEntity - Projection's Typeorm  entity
+     */
     protected constructor(
         readonly datasource: DataSource,
         readonly inboxEntity: new (params: IProjectionInboxEntity) => TInboxEntity,
@@ -23,6 +39,15 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
     ) {
     }
 
+    /**
+     * Inserts event into Projection's inbox.
+     * 
+     * @param no - Event no
+     * @param projectionName - Projection name
+     * @param streamName - Consumed stream name
+     * @param message - Event message
+     * @returns  
+     */
     async insertIntoInbox(no: number, projectionName: string, streamName: string, message: string): Promise<void> {
         try {
             const projectionInboxEntity: TInboxEntity = new this.inboxEntity({
@@ -40,7 +65,15 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
         }
     }
 
-
+    /**
+     * Gets next inbox event according to the position and passes it to callback project method. 
+     * Increases projection's position afterwards and deletes the projected inbox events.
+     * 
+     * @param projectionName - Projection's name
+     * @param streamName - Consumed stream name
+     * @param projectMethod - Callback project method
+     * @returns Last projected event no
+     */
     async projectNextInboxEvent(projectionName: string, streamName: string, projectMethod: (eventMessage: EventMessage, methods: TProjectionRepositoryMethods) => Promise<void>): Promise<number | null> {
         try {
             const lastProjectedNo: number | null = await this.getProjectionPosition(this.datasource.manager, projectionName, streamName);
@@ -70,28 +103,8 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
                         throw error;
                     }
                 }
-
-                const updatePositionEntry: QueryDeepPartialEntity<ProjectionPositionEntity> = {
-                    projectionName: projectionName,
-                    streamName: streamName,
-                    lastProjectedNo: inboxEvent.no,
-                    updatedAt: new Date(),
-                };
-                await transactionalEntityManager
-                    .getRepository(this.positionEntity)
-                    .upsert(
-                        updatePositionEntry as QueryDeepPartialEntity<TPositionEntity>,
-                        ['projectionName', 'streamName']
-                    );
-
-                await transactionalEntityManager
-                    .getRepository(this.inboxEntity)
-                    .createQueryBuilder(this.inboxEntity.name)
-                    .where('projection_name = :projectionName', { projectionName: projectionName })
-                    .andWhere('stream_name = :streamName', { streamName: streamName })
-                    .andWhere('no <= :no', { no: lastProjectedNo + 1 })
-                    .delete()
-                    .execute();
+                await this.updateProjectionPosition(transactionalEntityManager, projectionName, streamName, inboxEvent.no);
+                await this.deleteInboxEntriesUntil(transactionalEntityManager, projectionName, streamName, lastProjectedNo);
             });
             return lastProjectedNo + 1;
         } catch (error: any) {
@@ -103,7 +116,7 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
         }
     }
 
-    async getFromInbox(entityManager: EntityManager, projectionName: string, streamName: string, no: number): Promise<TInboxEntity | null> {
+    private async getFromInbox(entityManager: EntityManager, projectionName: string, streamName: string, no: number): Promise<TInboxEntity | null> {
         return await entityManager
             .getRepository(this.inboxEntity)
             .createQueryBuilder(this.inboxEntity.name)
@@ -115,7 +128,7 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
             .getOne();
     }
 
-    async getProjectionPosition(entityManager: EntityManager, projectionName: string, streamName: string): Promise<number | null> {
+    private async getProjectionPosition(entityManager: EntityManager, projectionName: string, streamName: string): Promise<number | null> {
         try {
             const findOptions: FindOneOptions<ProjectionPositionEntity> = {
                 where: {
@@ -134,23 +147,30 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
         }
     }
 
-    async updateProjectionPosition(entityManager: EntityManager, no: number, projectionName: string, streamName: string, message: string): Promise<boolean> {
-        try {
-            await entityManager
-                .getRepository(this.positionEntity)
-                .save(
-                    new this.positionEntity({
-                        projectionName: projectionName,
-                        streamName: streamName,
-                        lastProjectedNo: no,
-                        updatedAt: new Date(),
-                    }),
-                );
-            return true;
-        } catch (error: any) {
-            console.log(error);
-            return false;
-        }
+    private async deleteInboxEntriesUntil(transactionalEntityManager: EntityManager, projectionName: string, streamName: string, lastProjectedNo: number) {
+        await transactionalEntityManager
+            .getRepository(this.inboxEntity)
+            .createQueryBuilder(this.inboxEntity.name)
+            .where('projection_name = :projectionName', { projectionName: projectionName })
+            .andWhere('stream_name = :streamName', { streamName: streamName })
+            .andWhere('no <= :no', { no: lastProjectedNo + 1 })
+            .delete()
+            .execute();
+    }
+
+    private async updateProjectionPosition(transactionalEntityManager: EntityManager, projectionName: string, streamName: string, no: number) {
+        const updatePositionEntry: QueryDeepPartialEntity<ProjectionPositionEntity> = {
+            projectionName: projectionName,
+            streamName: streamName,
+            lastProjectedNo: no,
+            updatedAt: new Date(),
+        };
+        await transactionalEntityManager
+            .getRepository(this.positionEntity)
+            .upsert(
+                updatePositionEntry as QueryDeepPartialEntity<TPositionEntity>,
+                ['projectionName', 'streamName']
+            );
     }
 
     async getOne(entityManager: EntityManager, findOneOptions: FindOneOptions): Promise<TProjectedEntity | null> {

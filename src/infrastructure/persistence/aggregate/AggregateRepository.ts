@@ -8,8 +8,27 @@ import { AbstractAggregateStateEntity, IAggregateStateEntity } from "./Aggregate
 import { EventFactory } from "./EventFactory";
 import { ConflictError } from "../../../domain/errors/ConflictError";
 
+/**
+ * Persists and load aggregates and the corresponding events
+ * 
+ * Demos: 
+ * 
+ * - [Publishing](https://getcodebricks.com/docs/publishing)
+ * 
+ */
 export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<any>, TEventStreamEntity extends EventStreamEntity, TOutBoxEntity extends OutboxEntity, TAggregateStateEntity extends AbstractAggregateStateEntity, TEventFactory extends EventFactory> {
 
+    /**
+     * Initializes AbstractAggregateRepository
+     * 
+     * @param datasource - Typeorm DataSource
+     * @param aggregate - Aggregate Class
+     * @param eventStreamEntity - Event stream Typeorm entity
+     * @param outBoxEntity - Event outbox Typeorm entity
+     * @param aggregateStateEntity - Aggregate state Typeorm entity
+     * @param eventFactory - Event factory for deserialization
+     * @param streamName - Event stream name
+     */
     protected constructor(
         readonly datasource: DataSource,
         readonly aggregate: new (id: string) => TAggregate,
@@ -21,6 +40,11 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
     ) {
     }
 
+    /**
+     * Persists an aggregate, saves its pending events to event stream and outbox
+     * 
+     * @param aggregate - Aggregate to persist
+     */
     async save(aggregate: TAggregate): Promise<void> {
         if(!aggregate.pendingEvents.length){
             throw new ConflictError('No events to persist.');
@@ -88,6 +112,12 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
         }
     }
 
+    /**
+     * Loads aggregate from state or from event history.
+     * 
+     * @param aggregateId - Id of the aggreagte to load.
+     * @returns Aggregate or null
+     */
     async get(aggregateId: string): Promise<TAggregate | null> {
         const aggregateState: TAggregateStateEntity | null = await this.getAggregateState(aggregateId);
         const rawEvents: TEventStreamEntity[] = await this.getRawEvents(
@@ -108,7 +138,7 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
         return aggregate;
     }
 
-    async getAggregateState(aggregateId: string): Promise<TAggregateStateEntity | null> {
+    private async getAggregateState(aggregateId: string): Promise<TAggregateStateEntity | null> {
         const findOptions: FindOneOptions<AbstractAggregateStateEntity> = {
             where: {
                 aggregateId: aggregateId
@@ -122,7 +152,7 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
         return aggregateState;
     }
 
-    async getRawEvents(aggregateId: string, aggregateVersion: number): Promise<TEventStreamEntity[]> {
+    private async getRawEvents(aggregateId: string, aggregateVersion: number): Promise<TEventStreamEntity[]> {
         const findOptions: FindManyOptions<EventStreamEntity> = {
             where: {
                 aggregateId: aggregateId,
@@ -140,7 +170,7 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
         return rawEvents;
     }
 
-    async parseRawEvents(rawEvents: TEventStreamEntity[]): Promise<Event<any>[]> {
+    private async parseRawEvents(rawEvents: TEventStreamEntity[]): Promise<Event<any>[]> {
         return rawEvents.map(
             (rawEvent: TEventStreamEntity) => new this.eventFactory().getEvent[rawEvent.name](rawEvent)
         ).filter(Boolean) as Event<any>[];

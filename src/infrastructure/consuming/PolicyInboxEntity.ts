@@ -8,6 +8,14 @@ export interface IPolicyInboxEntity {
     message: string;
 };
 
+/**
+ * Saves incoming events for policies. 
+ * 
+ * * Demos: 
+ * 
+ * - [Consuming](https://getcodebricks.com/docs/consuming)
+ * 
+ */
 @Entity()
 @Unique(['no', 'useCaseName', 'streamName'])
 export abstract class PolicyInboxEntity {

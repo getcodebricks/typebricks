@@ -12,6 +12,15 @@ export interface IEventMessage {
     compressed?: boolean;
 }
 
+/**
+ * Generic event message used for consuming and publishing
+ * 
+ * Demos: 
+ * 
+ * - [Publishing](https://getcodebricks.com/docs/publishing)
+ * - [Consuming](https://getcodebricks.com/docs/consuming)
+ * 
+ */
 export class EventMessage {
     streamName: string;
     no?: number;
@@ -35,6 +44,11 @@ export class EventMessage {
         this.compressed = props?.compressed ?? false;
     }
 
+    /**
+     * Compresses event payload using gzip
+     * 
+     * @returns Compressed event message
+     */
     async compressPayload(): Promise<EventMessage> {
         if (!this.compressed) {
             const payloadCompressed: string = (await gzip(this.payload)).toString('base64');
@@ -47,6 +61,11 @@ export class EventMessage {
         throw new Error('Payload is already compressed');
     }
 
+    /**
+     * Uncompresses event payload using gzip
+     * 
+     * @returns Uncompressed event message
+     */
     async uncompressPayload(): Promise<EventMessage> {
         if (this.compressed) {
             const payloadUncompressed = (await ungzip(Buffer.from(this.payload, 'base64'))).toString();
