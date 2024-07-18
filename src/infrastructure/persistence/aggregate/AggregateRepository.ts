@@ -6,6 +6,7 @@ import { Event } from "../../../domain/Event";
 import { IOutboxEntity, OutboxEntity } from "../../publishing/OutboxEntity";
 import { AbstractAggregateStateEntity, IAggregateStateEntity } from "./AggregateStateEntity";
 import { EventFactory } from "./EventFactory";
+import { ConflictError } from "../../../domain/errors/ConflictError";
 
 export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<any>, TEventStreamEntity extends EventStreamEntity, TOutBoxEntity extends OutboxEntity, TAggregateStateEntity extends AbstractAggregateStateEntity, TEventFactory extends EventFactory> {
 
@@ -21,6 +22,10 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
     }
 
     async save(aggregate: TAggregate): Promise<void> {
+        if(!aggregate.pendingEvents.length){
+            throw new ConflictError('No events to persist.');
+        }
+        
         try {
             await this.datasource.manager.transaction(async (transactionalEntityManager: EntityManager) => {
                 const findOptions: FindManyOptions<EventStreamEntity> = {
