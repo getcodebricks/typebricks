@@ -15,4 +15,4 @@ You can find the Type Bricks documentation [on the website](https://getcodebrick
 Check out the [Getting Started](https://getcodebricks.com/docs/category/getting-started) page for a quick overview.
 
 ## License
-Type Bricks is [MIT licensed](https://github.com/getcodebricks/typebricks/blob/main/LICENSE)).
+Type Bricks is [MIT licensed](https://github.com/getcodebricks/typebricks/blob/main/LICENSE).
