@@ -1,0 +1,48 @@
+workflow:
+  rules:
+    # - if: $CI_COMMIT_BRANCH == "develop"
+    #   variables:
+    #     ENVIRONMENT: development
+    - if: $CI_COMMIT_BRANCH == "master"
+      variables:
+        ENVIRONMENT: production
+
+stages:
+    - build
+    - deploy_npm
+
+build:
+    stage: build
+    environment:
+        name: $ENVIRONMENT
+    image: node:latest
+    before_script:
+        - npm i --omit=dev
+    script:
+        - npm run build
+    artifacts:
+        paths:
+            - dist
+    rules:
+        # - if: '$CI_COMMIT_REF_NAME == "develop"'
+        #   when: always
+        - if: '$CI_COMMIT_REF_NAME == "master"'
+          when: always
+
+deploy_npm:
+    stage: deploy_npm
+    environment:
+        name: $ENVIRONMENT
+    dependencies:
+        - build
+    image: node:latest
+    before_script:
+        - npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
+    script:
+        - cd dist
+        - npm publish --verbose
+    rules:
+        # - if: '$CI_COMMIT_REF_NAME == "develop"'
+        #   when: on_success
+        - if: '$CI_COMMIT_REF_NAME == "master"'
+          when: on_success

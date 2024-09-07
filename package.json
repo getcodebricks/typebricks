@@ -1,0 +1,46 @@
+{
+    "name": "@codebricks/codebricks-framework",
+    "version": "0.3.0",
+    "description": "",
+    "main": "index.js",
+    "types": "index.d.ts",
+    "files": [
+        "/"
+    ],
+    "scripts": {
+        "prebuild": "rm -Rf ./dist",
+        "build": "tsc --project tsconfig.build.json",
+        "postbuild": "npm run distPackage",
+        "distPackage": "cp package.json ./dist/ && npx json -I -f ./dist/package.json -e 'this.scripts={}' -e 'this.private=false' ",
+        "testAndMigrate": "npm run migration && mocha -r ts-node/register tests/**/*.test.ts -g 'bank account events'",
+        "test": "mocha --full-trace -r ts-node/register tests/domain/**/*.test.ts",
+        "testExample": "export $(cat .env | xargs) && mocha -r ts-node/register examples/**/**/**/BankAccountOverviewProjection.test.ts",
+        "coverage": "nyc -r text -e .ts -x \"tests/*.test.ts\" npm run test",
+        "migration": "ts-node ./node_modules/typeorm/cli.js migration:run -d ./src/infrastructure/app-data-source.ts"
+    },
+    "dependencies": {
+        "@aws-sdk/client-eventbridge": "^3.535.0",
+        "@aws-sdk/client-sqs": "^3.536.0",
+        "@types/node-gzip": "^1.1.3",
+        "@types/uuid": "^9.0.8",
+        "is-what": "^4.1.16",
+        "node-gzip": "^1.1.2",
+        "pg": "^8.11.3",
+        "shallow-equal": "^3.1.0",
+        "shallow-equal-object": "^1.1.1",
+        "typeorm": "^0.3.6",
+        "uuid": "^9.0.1"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.3.13",
+        "@types/mocha": "^10.0.6",
+        "@types/node": "^20.11.30",
+        "aws-sdk-client-mock": "^4.0.0",
+        "chai": "^5.1.0",
+        "dotenv": "^16.0.0",
+        "mocha": "^10.3.0",
+        "nyc": "^15.1.0",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.4.2"
+    }
+}
