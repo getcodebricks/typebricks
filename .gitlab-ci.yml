@@ -1,6 +1,6 @@
 workflow:
   rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_TAG
       variables:
         ENVIRONMENT: production
 
@@ -21,8 +21,7 @@ build:
         paths:
             - dist
     rules:
-        - if: '$CI_COMMIT_REF_NAME == "main"'
-          when: always
+        - if: $CI_COMMIT_TAG
 
 deploy_npm:
     stage: deploy_npm
@@ -34,8 +33,8 @@ deploy_npm:
     before_script:
         - npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
     script:
+        - cp ./README.md ./dist/
         - cd dist
         - npm publish --verbose
     rules:
-        - if: '$CI_COMMIT_REF_NAME == "main"'
-          when: on_success
+        - if: $CI_COMMIT_TAG
