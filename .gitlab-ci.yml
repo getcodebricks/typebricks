@@ -1,8 +1,5 @@
 workflow:
   rules:
-    # - if: $CI_COMMIT_BRANCH == "develop"
-    #   variables:
-    #     ENVIRONMENT: development
     - if: $CI_COMMIT_BRANCH == "master"
       variables:
         ENVIRONMENT: production
@@ -24,9 +21,7 @@ build:
         paths:
             - dist
     rules:
-        # - if: '$CI_COMMIT_REF_NAME == "develop"'
-        #   when: always
-        - if: '$CI_COMMIT_REF_NAME == "master"'
+        - if: '$CI_COMMIT_REF_NAME == "main"'
           when: always
 
 deploy_npm:
@@ -42,7 +37,5 @@ deploy_npm:
         - cd dist
         - npm publish --verbose
     rules:
-        # - if: '$CI_COMMIT_REF_NAME == "develop"'
-        #   when: on_success
-        - if: '$CI_COMMIT_REF_NAME == "master"'
+        - if: '$CI_COMMIT_REF_NAME == "main"'
           when: on_success
