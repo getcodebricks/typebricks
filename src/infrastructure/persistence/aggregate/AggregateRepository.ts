@@ -7,6 +7,7 @@ import { IOutboxEntity, OutboxEntity } from "../../publishing/OutboxEntity";
 import { AbstractAggregateStateEntity, IAggregateStateEntity } from "./AggregateStateEntity";
 import { EventFactory } from "./EventFactory";
 import { ConflictError } from "../../../domain/errors/ConflictError";
+import { parseToDateTime } from "../../../utils/parseToDateTime";
 
 /**
  * Persists and load aggregates and the corresponding events
@@ -130,7 +131,7 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
         const events: Event<any>[] = await this.parseRawEvents(rawEvents);
         const aggregate: TAggregate = new this.aggregate(aggregateId);
         if (aggregateState) {
-            aggregate.state = JSON.parse(aggregateState.state);
+            aggregate.state = JSON.parse(aggregateState.state, parseToDateTime);
             aggregate.version = aggregateState.aggregateVersion;
         }
         aggregate.loadFromHistory(events);
