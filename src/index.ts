@@ -31,4 +31,5 @@ export * from './infrastructure/aws/ApiGateway'
 export * from './infrastructure/aws/SQS'
 export * from './utils/OverwriteProtectionDecorator'
 export * from './utils/shallowEqualObject'
+export * from './utils/parseToDateTime'
 

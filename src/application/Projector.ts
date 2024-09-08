@@ -4,6 +4,7 @@ import { InboundEvent } from "./InboundEvent";
 import { IProjectionRepositoryMethods, ProjectionRepository } from "../infrastructure/consuming/ProjectionRepository";
 import { ProjectionInboxEntity } from "../infrastructure/consuming/ProjectionInboxEntity";
 import { ProjectionPositionEntity } from "../infrastructure/consuming/ProjectionPositionEntity";
+import { parseToDateTime } from "../utils/parseToDateTime";
 
 export type ProjectMethods = {
     [key: string]: (eventMessage: InboundEvent<any>, methods: IProjectionRepositoryMethods<any>) => Promise<void>;
@@ -69,7 +70,7 @@ export abstract class Projector<TProjectionEntity extends BaseEntity> {
                                 aggregateId: eventMessage.aggregateId,
                                 aggregateVersion: eventMessage.aggregateVersion,
                                 name: eventMessage.name,
-                                payload: JSON.parse(eventMessage.payload),
+                                payload: JSON.parse(eventMessage.payload, parseToDateTime),
                                 occurredAt: eventMessage.occurredAt,
                             },
                             methods

@@ -3,6 +3,7 @@ import { PolicyInboxEntity } from "../infrastructure/consuming/PolicyInboxEntity
 import { PolicyPositionEntity } from "../infrastructure/consuming/PolicyPositionEntity";
 import { PolicyRepository } from "../infrastructure/consuming/PolicyRepository";
 import { InboundEvent } from "./InboundEvent";
+import { parseToDateTime } from "../utils/parseToDateTime";
 
 export type ProcessMethods = {
     [key: string]: (eventMessage: InboundEvent<any>) => Promise<void>;
@@ -67,7 +68,7 @@ export abstract class Policy {
                                 aggregateId: eventMessage.aggregateId,
                                 aggregateVersion: eventMessage.aggregateVersion,
                                 name: eventMessage.name,
-                                payload: JSON.parse(eventMessage.payload),
+                                payload: JSON.parse(eventMessage.payload, parseToDateTime),
                                 occurredAt: eventMessage.occurredAt,
                             }
                         );
