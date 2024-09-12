@@ -12,9 +12,7 @@
         "build": "tsc --project tsconfig.build.json",
         "postbuild": "npm run distPackage",
         "distPackage": "cp package.json ./dist/ && npx json -I -f ./dist/package.json -e 'this.scripts={}' -e 'this.private=false' ",
-        "testAndMigrate": "npm run migration && mocha -r ts-node/register tests/**/*.test.ts -g 'bank account events'",
         "test": "mocha --full-trace -r ts-node/register tests/domain/**/*.test.ts",
-        "testExample": "export $(cat .env | xargs) && mocha -r ts-node/register examples/**/**/**/BankAccountOverviewProjection.test.ts",
         "coverage": "nyc -r text -e .ts -x \"tests/*.test.ts\" npm run test",
         "migration": "ts-node ./node_modules/typeorm/cli.js migration:run -d ./src/infrastructure/app-data-source.ts"
     },
