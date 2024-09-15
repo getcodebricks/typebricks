@@ -5,11 +5,11 @@ import { NoInboxEventFoundError } from "./errors/NoInboxEventFoundError";
 import { IProjectionInboxEntity, ProjectionInboxEntity } from "./ProjectionInboxEntity";
 import { IProjectionPositionEntity, ProjectionPositionEntity } from "./ProjectionPositionEntity";
 
-export interface IProjectionRepositoryMethods<TProjectedEntity> {
-    getOne: (findOneOptions: FindOneOptions) => Promise<TProjectedEntity | null>;
-    getMany: (findManyOptions: FindManyOptions) => Promise<TProjectedEntity[]>;
-    updateOne: (projectedEntity: TProjectedEntity) => Promise<TProjectedEntity | null>;
-    updateMany: (projectedEntities: TProjectedEntity[]) => Promise<TProjectedEntity[]>;
+export interface IProjectionRepositoryMethods{
+    getOne: (findOneOptions: FindOneOptions) => Promise<any | null>;
+    getMany: (findManyOptions: FindManyOptions) => Promise<any[]>;
+    updateOne: (projectedEntity: any) => Promise<any | null>;
+    updateMany: (projectedEntities: any[]) => Promise<any[]>;
     delete: (findManyOptions: FindManyOptions) => Promise<number | null | undefined>;
 }
 
@@ -21,7 +21,7 @@ export interface IProjectionRepositoryMethods<TProjectedEntity> {
  * - [Consuming](https://getcodebricks.com/docs/consuming)
  * 
  */
-export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxEntity, TPositionEntity extends ProjectionPositionEntity, TProjectedEntity extends BaseEntity, TProjectionRepositoryMethods extends IProjectionRepositoryMethods<TProjectedEntity>> {
+export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxEntity, TPositionEntity extends ProjectionPositionEntity, TProjectedEntity extends BaseEntity, TProjectionRepositoryMethods extends IProjectionRepositoryMethods> {
 
     /**
      * Initializes ProjectionRepository
@@ -181,12 +181,12 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
         return await entityManager.find(this.projectedEntity, findManyOptions);
     }
 
-    async updateOne(entityManager: EntityManager, projectedEntity: TProjectedEntity): Promise<TProjectedEntity | null> {
-        return await entityManager.save(projectedEntity);
+    async updateOne(entityManager: EntityManager, projectedEntity: any): Promise<TProjectedEntity | null> {
+        return await entityManager.save(new this.projectedEntity(projectedEntity));
     }
 
-    async updateMany(entityManager: EntityManager, projectedEntities: TProjectedEntity[]): Promise<TProjectedEntity[]> {
-        return await entityManager.save(projectedEntities);
+    async updateMany(entityManager: EntityManager, projectedEntities: any[]): Promise<TProjectedEntity[]> {
+        return await entityManager.save(projectedEntities.map((projectedEntity: any) => new this.projectedEntity(projectedEntity)));
     }
 
     async delete(entityManager: EntityManager, findManyOptions: FindManyOptions): Promise<number | null | undefined> {

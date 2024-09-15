@@ -18,7 +18,7 @@ class ProjectionRecreator {
      * @param projector - Projection's projector
      */
     constructor(
-        private readonly projector: Projector<any>,
+        private readonly projector: Projector,
     ) {
     }
 

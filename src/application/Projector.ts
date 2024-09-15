@@ -7,7 +7,7 @@ import { ProjectionPositionEntity } from "../infrastructure/consuming/Projection
 import { parseToDateTime } from "../utils/parseToDateTime";
 
 export type ProjectMethods = {
-    [key: string]: (eventMessage: InboundEvent<any>, methods: IProjectionRepositoryMethods<any>) => Promise<void>;
+    [key: string]: (eventMessage: InboundEvent<any>, methods: IProjectionRepositoryMethods) => Promise<void>;
 };
 
 
@@ -19,7 +19,7 @@ export type ProjectMethods = {
  * - [Consuming](https://getcodebricks.com/docs/consuming)
  * 
  */
-export abstract class Projector<TProjectionEntity extends BaseEntity> {
+export abstract class Projector {
     abstract projectionName: string;
     abstract projectMethods: ProjectMethods;
     abstract streamNames: string[];
@@ -29,7 +29,7 @@ export abstract class Projector<TProjectionEntity extends BaseEntity> {
      * 
      * @param repository - Projector's repository
      */
-    constructor(readonly repository: ProjectionRepository<ProjectionInboxEntity, ProjectionPositionEntity, BaseEntity, IProjectionRepositoryMethods<any>>) {
+    constructor(readonly repository: ProjectionRepository<ProjectionInboxEntity, ProjectionPositionEntity, BaseEntity, IProjectionRepositoryMethods>) {
     }
 
     /**
@@ -60,7 +60,7 @@ export abstract class Projector<TProjectionEntity extends BaseEntity> {
                 const lastProjectedNo: number | null = await this.repository.projectNextInboxEvent(
                     this.projectionName,
                     streamName,
-                    async (eventMessage: EventMessage, methods: IProjectionRepositoryMethods<TProjectionEntity>) => {
+                    async (eventMessage: EventMessage, methods: IProjectionRepositoryMethods) => {
                         const projectionMethod: string = `${streamName}.${eventMessage.name}`;
                         await this.projectMethods[projectionMethod](
                             {
