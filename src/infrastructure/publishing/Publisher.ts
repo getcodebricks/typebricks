@@ -38,19 +38,8 @@ export class Publisher<T extends OutboxEntity> {
      * @returns
      */
     async publish(): Promise<void> {
-        await this.initDataSource();
         await this.setSequenceNumbers();
         await this.publishEvents();
-    }
-
-    private async initDataSource(): Promise<void> {
-        if (!this.appDataSource.isInitialized) {
-            await this.appDataSource.initialize()
-                .then(() => { })
-                .catch((err) => {
-                    console.error("Error during Data Source initialization", err);
-                });
-        }
     }
 
     private async setSequenceNumbers() {
