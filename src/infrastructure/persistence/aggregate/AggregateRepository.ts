@@ -1,4 +1,4 @@
-import { Between, DataSource, EntityManager, FindManyOptions, MoreThan, FindOneOptions } from "typeorm";
+import { Between, FindManyOptions, MoreThan, FindOneOptions, QueryRunner } from "typeorm";
 import { EventStreamEntity, IEventStreamEntity } from "./EventStreamEntity";
 import { EventMessage } from "./EventMessage";
 import { Aggregate } from "../../../domain/Aggregate";
@@ -22,7 +22,7 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
     /**
      * Initializes AbstractAggregateRepository
      * 
-     * @param datasource - Typeorm DataSource
+     * @param queryRunner - Typeorm QueryRunner
      * @param aggregate - Aggregate Class
      * @param eventStreamEntity - Event stream Typeorm entity
      * @param outBoxEntity - Event outbox Typeorm entity
@@ -31,7 +31,7 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
      * @param streamName - Event stream name
      */
     protected constructor(
-        readonly datasource: DataSource,
+        readonly queryRunner: QueryRunner,
         readonly aggregate: new (id: string) => TAggregate,
         readonly eventStreamEntity: new (params: IEventStreamEntity) => TEventStreamEntity,
         readonly outBoxEntity: new (params: IOutboxEntity) => TOutBoxEntity,
@@ -47,34 +47,39 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
      * @param aggregate - Aggregate to persist
      */
     async save(aggregate: TAggregate): Promise<void> {
-        if(!aggregate.pendingEvents.length){
+        if (!aggregate.pendingEvents.length) {
             throw new ConflictError('No events to persist.');
         }
-        
+
         try {
-            await this.datasource.manager.transaction(async (transactionalEntityManager: EntityManager) => {
-                const findOptions: FindManyOptions<EventStreamEntity> = {
-                    where: {
-                        aggregateId: aggregate.id,
-                        aggregateVersion: Between(
-                            aggregate.pendingEvents[0].aggregateVersion,
-                            aggregate.pendingEvents[aggregate.pendingEvents.length - 1].aggregateVersion
-                        )
-                    }
-                };
-                const result: TEventStreamEntity[] = await transactionalEntityManager.find(
-                    this.eventStreamEntity,
-                    findOptions as FindManyOptions<TEventStreamEntity>
-                );
-
-                if (result.length) {
-                    console.error("Race condition while persisting aggregate.");
-                    throw new Error("Race condition while persisting aggregate.");
+            const findOptions: FindManyOptions<EventStreamEntity> = {
+                where: {
+                    aggregateId: aggregate.id,
+                    aggregateVersion: Between(
+                        aggregate.pendingEvents[0].aggregateVersion,
+                        aggregate.pendingEvents[aggregate.pendingEvents.length - 1].aggregateVersion
+                    )
                 }
+            };
+            const result: TEventStreamEntity[] = await this.queryRunner.manager.find(
+                this.eventStreamEntity,
+                findOptions as FindManyOptions<TEventStreamEntity>
+            );
 
+            if (result.length) {
+                console.error("Race condition while persisting aggregate.");
+                throw new Error("Race condition while persisting aggregate.");
+            }
+
+            var setTransaction = false;
+            if (!this.queryRunner.isTransactionActive) {
+                setTransaction = true;
+                await this.queryRunner.startTransaction();
+            }
+            try {
                 await Promise.all(aggregate.pendingEvents.map(async (pendingEvent: Event<any>) => {
                     const event: TEventStreamEntity = new this.eventStreamEntity(pendingEvent);
-                    await transactionalEntityManager.save(
+                    await this.queryRunner.manager.save(
                         this.eventStreamEntity,
                         event
                     );
@@ -92,15 +97,21 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
                         name: eventMessage.name,
                         message: JSON.stringify(eventMessage)
                     });
-                    await transactionalEntityManager.save(
+                    await this.queryRunner.manager.save(
                         this.outBoxEntity,
                         outbox
                     );
                 }));
-            });
+                if (setTransaction) await this.queryRunner.commitTransaction();
+            } catch (error) {
+                if (setTransaction) await this.queryRunner.rollbackTransaction();
+
+                console.error('Error during transaction saving of Aggregate: ' + error);
+                throw error;
+            }
             aggregate.pendingEvents = [];
 
-            await this.datasource.manager.save(
+            await this.queryRunner.manager.save(
                 new this.aggregateStateEntity({
                     aggregateId: aggregate.id,
                     aggregateVersion: aggregate.version,
@@ -145,7 +156,7 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
                 aggregateId: aggregateId
             }
         };
-        const aggregateState: TAggregateStateEntity | null = await this.datasource.manager.findOne(
+        const aggregateState: TAggregateStateEntity | null = await this.queryRunner.manager.findOne(
             this.aggregateStateEntity,
             findOptions as FindOneOptions<TAggregateStateEntity>
         );
@@ -163,7 +174,7 @@ export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<a
                 aggregateVersion: 'ASC'
             }
         };
-        const rawEvents: TEventStreamEntity[] = await this.datasource.manager.find(
+        const rawEvents: TEventStreamEntity[] = await this.queryRunner.manager.find(
             this.eventStreamEntity,
             findOptions as FindManyOptions<TEventStreamEntity>
         );
