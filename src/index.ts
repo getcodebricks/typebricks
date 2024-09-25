@@ -1,3 +1,5 @@
+import exp from 'constants'
+
 export * from './domain/Aggregate'
 export * from './domain/Command'
 export * from './domain/errors/ConflictError'
@@ -20,6 +22,7 @@ export * from './infrastructure/consuming/PolicyRepository'
 export * from './infrastructure/consuming/ProjectionInboxEntity'
 export * from './infrastructure/consuming/ProjectionPositionEntity'
 export * from './infrastructure/consuming/ProjectionRecreator'
+export * from './infrastructure/consuming/InboundEventFactory'
 export * from './infrastructure/persistence/aggregate/EventMessage'
 export * from './infrastructure/persistence/aggregate/AggregateStateEntity'
 export * from './infrastructure/persistence/projection/JsonColumnTransformer'
