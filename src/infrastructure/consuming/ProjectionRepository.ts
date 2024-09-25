@@ -1,9 +1,10 @@
 import { EntityManager, FindOneOptions, FindManyOptions, DeleteResult, DataSource, BaseEntity } from "typeorm";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
-import { EventMessage } from "../persistence/aggregate/EventMessage";
 import { NoInboxEventFoundError } from "./errors/NoInboxEventFoundError";
 import { IProjectionInboxEntity, ProjectionInboxEntity } from "./ProjectionInboxEntity";
 import { IProjectionPositionEntity, ProjectionPositionEntity } from "./ProjectionPositionEntity";
+import { InboundEvent } from "../../application/InboundEvent";
+import { InboundEventFactory } from "./InboundEventFactory";
 
 export interface IProjectionRepositoryMethods{
     getOne: (findOneOptions: FindOneOptions) => Promise<any | null>;
@@ -21,7 +22,7 @@ export interface IProjectionRepositoryMethods{
  * - [Consuming](https://getcodebricks.com/docs/consuming)
  * 
  */
-export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxEntity, TPositionEntity extends ProjectionPositionEntity, TProjectedEntity extends BaseEntity, TProjectionRepositoryMethods extends IProjectionRepositoryMethods> {
+export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxEntity, TPositionEntity extends ProjectionPositionEntity, TProjectedEntity extends BaseEntity, TInboundEventFactory extends InboundEventFactory, TProjectionRepositoryMethods extends IProjectionRepositoryMethods> {
 
     /**
      * Initializes ProjectionRepository
@@ -30,12 +31,14 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
      * @param inboxEntity - Projection's inbox Typeorm entity
      * @param positionEntity - Projection's position Typeorm entity 
      * @param projectedEntity - Projection's Typeorm  entity
+     * @param eventFactory - Event factory for deserialization
      */
     protected constructor(
         readonly datasource: DataSource,
         readonly inboxEntity: new (params: IProjectionInboxEntity) => TInboxEntity,
         readonly positionEntity: new (params: IProjectionPositionEntity) => TPositionEntity,
         readonly projectedEntity: new (params: any) => TProjectedEntity,
+        readonly eventFactory: new () => TInboundEventFactory,
     ) {
     }
 
@@ -74,7 +77,7 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
      * @param projectMethod - Callback project method
      * @returns Last projected event no
      */
-    async projectNextInboxEvent(projectionName: string, streamName: string, projectMethod: (eventMessage: EventMessage, methods: TProjectionRepositoryMethods) => Promise<void>): Promise<number | null> {
+    async projectNextInboxEvent(projectionName: string, streamName: string, projectMethod: (inboundEvent: InboundEvent<any>, methods: TProjectionRepositoryMethods) => Promise<void>): Promise<number | null> {
         try {
             const lastProjectedNo: number | null = await this.getProjectionPosition(this.datasource.manager, projectionName, streamName);
             if (lastProjectedNo == null) {
@@ -86,10 +89,10 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
                 if (!inboxEvent) {
                     throw new NoInboxEventFoundError(`No inbox event found for no ${lastProjectedNo + 1} of ${projectionName} and stream ${streamName}`);
                 }
-                const inboxEventMessage: EventMessage = new EventMessage(JSON.parse(inboxEvent.message));
+                const inboundEvent: InboundEvent<any> = await this.parseRawInboxEvent(inboxEvent);
                 try {
                     await projectMethod(
-                        inboxEventMessage,
+                        inboundEvent,
                         {
                             getOne: (findOneOptions: FindOneOptions) => this.getOne(transactionalEntityManager, findOneOptions),
                             getMany: (findManyOptions: FindManyOptions) => this.getMany(transactionalEntityManager, findManyOptions),
@@ -171,6 +174,12 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
                 updatePositionEntry as QueryDeepPartialEntity<TPositionEntity>,
                 ['projectionName', 'streamName']
             );
+    }
+
+    private async parseRawInboxEvent(rawEvent: TInboxEntity): Promise<InboundEvent<any>> {
+        const eventName: string = JSON.parse(rawEvent.message).name;
+
+        return new this.eventFactory().getInboundEvent[eventName](rawEvent);
     }
 
     async getOne(entityManager: EntityManager, findOneOptions: FindOneOptions): Promise<TProjectedEntity | null> {

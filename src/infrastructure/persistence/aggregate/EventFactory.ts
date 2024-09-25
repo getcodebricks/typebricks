@@ -6,7 +6,7 @@ interface EventBuilder {
 }
 
 /**
- * Deserializes generic event stream into their corresponding event classes.
+ * Deserializes generic event stream entities into their corresponding event classes.
  */
 export abstract class EventFactory {
     readonly getEvent: EventBuilder;

@@ -3,10 +3,10 @@ import { PolicyInboxEntity } from "../infrastructure/consuming/PolicyInboxEntity
 import { PolicyPositionEntity } from "../infrastructure/consuming/PolicyPositionEntity";
 import { PolicyRepository } from "../infrastructure/consuming/PolicyRepository";
 import { InboundEvent } from "./InboundEvent";
-import { parseToDateTime } from "../utils/parseToDateTime";
+import { InboundEventFactory } from "../infrastructure/consuming/InboundEventFactory";
 
 export type ProcessMethods = {
-    [key: string]: (eventMessage: InboundEvent<any>) => Promise<void>;
+    [key: string]: (inboundEvent: InboundEvent<any>) => Promise<void>;
 };
 
 /**
@@ -27,7 +27,7 @@ export abstract class Policy {
      * 
      * @param repository - Policy's repository
      */
-    constructor(readonly repository: PolicyRepository<PolicyInboxEntity, PolicyPositionEntity>) {
+    constructor(readonly repository: PolicyRepository<PolicyInboxEntity, PolicyPositionEntity, InboundEventFactory>) {
     }
 
     /**
@@ -58,20 +58,9 @@ export abstract class Policy {
                 const lastProcessedNo: number | null = await this.repository.processNextInboxEvent(
                     this.useCaseName,
                     streamName,
-                    async (eventMessage: EventMessage) => {
-                        const processionMethod: string = `${streamName}.${eventMessage.name}`;
-                        await this.processMethods[processionMethod](
-                            {
-                                streamName: eventMessage.streamName,
-                                no: eventMessage.no!,
-                                id: eventMessage.id,
-                                aggregateId: eventMessage.aggregateId,
-                                aggregateVersion: eventMessage.aggregateVersion,
-                                name: eventMessage.name,
-                                payload: JSON.parse(eventMessage.payload, parseToDateTime),
-                                occurredAt: eventMessage.occurredAt,
-                            }
-                        );
+                    async (inboundEvent: InboundEvent<any>) => {
+                        const processingMethod: string = `${streamName}.${inboundEvent.name}`;
+                        await this.processMethods[processingMethod](inboundEvent);
                     }
                 );
 

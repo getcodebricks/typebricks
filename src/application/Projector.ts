@@ -4,7 +4,7 @@ import { InboundEvent } from "./InboundEvent";
 import { IProjectionRepositoryMethods, ProjectionRepository } from "../infrastructure/consuming/ProjectionRepository";
 import { ProjectionInboxEntity } from "../infrastructure/consuming/ProjectionInboxEntity";
 import { ProjectionPositionEntity } from "../infrastructure/consuming/ProjectionPositionEntity";
-import { parseToDateTime } from "../utils/parseToDateTime";
+import { InboundEventFactory } from "../infrastructure/consuming/InboundEventFactory";
 
 export type ProjectMethods = {
     [key: string]: (eventMessage: InboundEvent<any>, methods: IProjectionRepositoryMethods) => Promise<void>;
@@ -29,7 +29,7 @@ export abstract class Projector {
      * 
      * @param repository - Projector's repository
      */
-    constructor(readonly repository: ProjectionRepository<ProjectionInboxEntity, ProjectionPositionEntity, BaseEntity, IProjectionRepositoryMethods>) {
+    constructor(readonly repository: ProjectionRepository<ProjectionInboxEntity, ProjectionPositionEntity, BaseEntity, InboundEventFactory, IProjectionRepositoryMethods>) {
     }
 
     /**
@@ -60,21 +60,9 @@ export abstract class Projector {
                 const lastProjectedNo: number | null = await this.repository.projectNextInboxEvent(
                     this.projectionName,
                     streamName,
-                    async (eventMessage: EventMessage, methods: IProjectionRepositoryMethods) => {
-                        const projectionMethod: string = `${streamName}.${eventMessage.name}`;
-                        await this.projectMethods[projectionMethod](
-                            {
-                                streamName: eventMessage.streamName,
-                                no: eventMessage.no!,
-                                id: eventMessage.id,
-                                aggregateId: eventMessage.aggregateId,
-                                aggregateVersion: eventMessage.aggregateVersion,
-                                name: eventMessage.name,
-                                payload: JSON.parse(eventMessage.payload, parseToDateTime),
-                                occurredAt: eventMessage.occurredAt,
-                            },
-                            methods
-                        );
+                    async (inboundEvent: InboundEvent<any>, methods: IProjectionRepositoryMethods) => {
+                        const processingMethod: string = `${streamName}.${inboundEvent.name}`;
+                        await this.projectMethods[processingMethod](inboundEvent, methods);
                     }
                 );
 

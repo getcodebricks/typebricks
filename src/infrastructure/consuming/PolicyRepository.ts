@@ -1,9 +1,10 @@
 import { FindOneOptions, QueryRunner } from "typeorm";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { IPolicyInboxEntity, PolicyInboxEntity } from "./PolicyInboxEntity";
-import { EventMessage } from "../persistence/aggregate/EventMessage";
 import { PolicyPositionEntity, IPolicyPositionEntity } from "./PolicyPositionEntity";
 import { NoInboxEventFoundError } from "./errors/NoInboxEventFoundError";
+import { InboundEvent } from "../../application/InboundEvent";
+import { InboundEventFactory } from "./InboundEventFactory";
 
 /**
  * Persists incoming events from inbox and processes events from inbox.
@@ -13,7 +14,7 @@ import { NoInboxEventFoundError } from "./errors/NoInboxEventFoundError";
  * - [Consuming](https://getcodebricks.com/docs/consuming)
  * 
  */
-export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, TPositionEntity extends PolicyPositionEntity> {
+export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, TPositionEntity extends PolicyPositionEntity, TInboundEventFactory extends InboundEventFactory> {
 
     /**
      * Initializes PolicyRepository.
@@ -21,11 +22,13 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
      * @param queryRunner - Typeorm QueryRunner
      * @param inboxEntity - Policy's inbox Typeorm entity
      * @param positionEntity - Policy's position Typeorm entity
+     * @param eventFactory - Event factory for deserialization
      */
     protected constructor(
         readonly queryRunner: QueryRunner,
         readonly inboxEntity: new (params: IPolicyInboxEntity) => TInboxEntity,
         readonly positionEntity: new (params: IPolicyPositionEntity) => TPositionEntity,
+        readonly eventFactory: new () => TInboundEventFactory,
     ) {
     }
 
@@ -64,7 +67,7 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
      * @param processMethod - Callback process method
      * @returns Last processed event no.
      */
-    async processNextInboxEvent(useCaseName: string, streamName: string, processMethod: (eventMessage: EventMessage) => Promise<void>): Promise<number | null> {
+    async processNextInboxEvent(useCaseName: string, streamName: string, processMethod: (inboxEvent: InboundEvent<any>) => Promise<void>): Promise<number | null> {
         await this.queryRunner.startTransaction();
         try {
             const lastProcessedNo: number | null = await this.getPolicyPosition(useCaseName, streamName);
@@ -76,9 +79,9 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
             if (!inboxEvent) {
                 throw new NoInboxEventFoundError(`No inbox event found for no ${lastProcessedNo + 1} of ${useCaseName} and stream ${streamName}`);
             }
-            const inboxEventMessage: EventMessage = new EventMessage(JSON.parse(inboxEvent.message));
+            const inboundEvent: InboundEvent<any> = await this.parseRawInboxEvent(inboxEvent);
             try {
-                await processMethod(inboxEventMessage);
+                await processMethod(inboundEvent);
             } catch (error: any) {
                 if (!(error instanceof TypeError)) {
                     throw error;
@@ -153,5 +156,11 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
             .andWhere('no <= :no', { no: lastProcessedNo + 1 })
             .delete()
             .execute();
+    }
+
+    private async parseRawInboxEvent(rawEvent: TInboxEntity): Promise<InboundEvent<any>> {
+        const eventName: string = JSON.parse(rawEvent.message).name;
+
+        return new this.eventFactory().getInboundEvent[eventName](rawEvent);
     }
 }
