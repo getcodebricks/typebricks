@@ -49,6 +49,7 @@ export class Publisher<T extends OutboxEntity> {
                 .createQueryBuilder('events')
                 .where('events.no IS NULL')
                 .orderBy('events.occurredAt')
+                .andOrderBy('events.aggregateVersion')
                 .setLock("pessimistic_write")
                 .limit(10)
                 .getMany();
