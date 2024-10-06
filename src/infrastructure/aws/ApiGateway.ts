@@ -36,6 +36,7 @@ export interface APIGatewayProxyEventBase<TAuthorizerContext> {
     stageVariables: APIGatewayProxyEventStageVariables | null;
     requestContext: APIGatewayEventRequestContextWithAuthorizer<TAuthorizerContext>;
     resource: string;
+    isWarmer?: boolean;
 }
 
 export interface APIGatewayEventRequestContextWithAuthorizer<TAuthorizerContext> {
