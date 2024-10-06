@@ -12,6 +12,7 @@ export interface SQSRecord {
 
 export interface SQSEvent {
     Records: SQSRecord[];
+    isWarmer?: boolean;
 }
 
 export interface SQSRecordAttributes {
