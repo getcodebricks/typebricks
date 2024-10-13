@@ -22,7 +22,7 @@ export interface IProjectionRepositoryMethods{
  * - [Consuming](https://getcodebricks.com/docs/consuming)
  * 
  */
-export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxEntity, TPositionEntity extends ProjectionPositionEntity, TProjectedEntity extends BaseEntity, TInboundEventFactory extends InboundEventFactory, TProjectionRepositoryMethods extends IProjectionRepositoryMethods> {
+export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxEntity, TPositionEntity extends ProjectionPositionEntity, TProjectedEntity extends BaseEntity, TProjectionRepositoryMethods extends IProjectionRepositoryMethods> {
 
     /**
      * Initializes ProjectionRepository
@@ -38,7 +38,7 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
         readonly inboxEntity: new (params: IProjectionInboxEntity) => TInboxEntity,
         readonly positionEntity: new (params: IProjectionPositionEntity) => TPositionEntity,
         readonly projectedEntity: new (params: any) => TProjectedEntity,
-        readonly eventFactory: new () => TInboundEventFactory,
+        readonly eventFactory: InboundEventFactory,
     ) {
     }
 
@@ -179,7 +179,7 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
     private async parseRawInboxEvent(rawEvent: TInboxEntity): Promise<InboundEvent<any>> {
         const eventName: string = JSON.parse(rawEvent.message).name;
 
-        return new this.eventFactory().getInboundEvent[eventName](rawEvent);
+        return this.eventFactory.getInboundEvent[eventName](rawEvent);
     }
 
     async getOne(entityManager: EntityManager, findOneOptions: FindOneOptions): Promise<TProjectedEntity | null> {
