@@ -6,7 +6,7 @@ import { IProjectionPositionEntity, ProjectionPositionEntity } from "./Projectio
 import { InboundEvent } from "../../application/InboundEvent";
 import { InboundEventFactory } from "./InboundEventFactory";
 
-export interface IProjectionRepositoryMethods{
+export interface IProjectionRepositoryMethods {
     getOne: (findOneOptions: FindOneOptions) => Promise<any | null>;
     getMany: (findManyOptions: FindManyOptions) => Promise<any[]>;
     updateOne: (projectedEntity: any) => Promise<any | null>;
@@ -89,8 +89,8 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
                 if (!inboxEvent) {
                     throw new NoInboxEventFoundError(`No inbox event found for no ${lastProjectedNo + 1} of ${projectionName} and stream ${streamName}`);
                 }
-                const inboundEvent: InboundEvent<any> = await this.parseRawInboxEvent(inboxEvent);
-                try {
+                const inboundEvent: InboundEvent<any> | null = await this.parseRawInboxEvent(inboxEvent);
+                if (inboundEvent) {
                     await projectMethod(
                         inboundEvent,
                         {
@@ -101,10 +101,6 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
                             delete: (findManyOptions: FindManyOptions) => this.delete(transactionalEntityManager, findManyOptions)
                         } as TProjectionRepositoryMethods
                     );
-                } catch (error: any) {
-                    if (!(error instanceof TypeError)) {
-                        throw error;
-                    }
                 }
                 await this.updateProjectionPosition(transactionalEntityManager, projectionName, streamName, inboxEvent.no);
                 await this.deleteInboxEntriesUntil(transactionalEntityManager, projectionName, streamName, lastProjectedNo);
@@ -176,10 +172,17 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
             );
     }
 
-    private async parseRawInboxEvent(rawEvent: TInboxEntity): Promise<InboundEvent<any>> {
+    private async parseRawInboxEvent(rawEvent: TInboxEntity): Promise<InboundEvent<any> | null> {
         const eventName: string = JSON.parse(rawEvent.message).name;
+        try {
+            return this.eventFactory.getInboundEvent[eventName](rawEvent);
+        } catch (error: any) {
+            if (!(error instanceof TypeError)) {
+                throw error;
+            }
+        }
 
-        return this.eventFactory.getInboundEvent[eventName](rawEvent);
+        return null;
     }
 
     async getOne(entityManager: EntityManager, findOneOptions: FindOneOptions): Promise<TProjectedEntity | null> {

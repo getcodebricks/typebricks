@@ -79,13 +79,9 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
             if (!inboxEvent) {
                 throw new NoInboxEventFoundError(`No inbox event found for no ${lastProcessedNo + 1} of ${useCaseName} and stream ${streamName}`);
             }
-            const inboundEvent: InboundEvent<any> = await this.parseRawInboxEvent(inboxEvent);
-            try {
+            const inboundEvent: InboundEvent<any> | null = await this.parseRawInboxEvent(inboxEvent);
+            if(inboundEvent){
                 await processMethod(inboundEvent);
-            } catch (error: any) {
-                if (!(error instanceof TypeError)) {
-                    throw error;
-                }
             }
             await this.updatePolicyPosition(useCaseName, streamName, inboxEvent.no);
             await this.queryRunner.commitTransaction();
@@ -158,9 +154,16 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
             .execute();
     }
 
-    private async parseRawInboxEvent(rawEvent: TInboxEntity): Promise<InboundEvent<any>> {
+    private async parseRawInboxEvent(rawEvent: TInboxEntity): Promise<InboundEvent<any> | null> {
         const eventName: string = JSON.parse(rawEvent.message).name;
+        try {
+            return this.eventFactory.getInboundEvent[eventName](rawEvent);
+        } catch (error: any) {
+            if (!(error instanceof TypeError)) {
+                throw error;
+            }
+        }
 
-        return this.eventFactory.getInboundEvent[eventName](rawEvent);
+        return null;
     }
 }
