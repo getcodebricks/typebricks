@@ -14,7 +14,7 @@ import { InboundEventFactory } from "./InboundEventFactory";
  * - [Consuming](https://getcodebricks.com/docs/consuming)
  * 
  */
-export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, TPositionEntity extends PolicyPositionEntity, TInboundEventFactory extends InboundEventFactory> {
+export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, TPositionEntity extends PolicyPositionEntity> {
 
     /**
      * Initializes PolicyRepository.
@@ -28,7 +28,7 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
         readonly queryRunner: QueryRunner,
         readonly inboxEntity: new (params: IPolicyInboxEntity) => TInboxEntity,
         readonly positionEntity: new (params: IPolicyPositionEntity) => TPositionEntity,
-        readonly eventFactory: new () => TInboundEventFactory,
+        readonly eventFactory: InboundEventFactory,
     ) {
     }
 
@@ -161,6 +161,6 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
     private async parseRawInboxEvent(rawEvent: TInboxEntity): Promise<InboundEvent<any>> {
         const eventName: string = JSON.parse(rawEvent.message).name;
 
-        return new this.eventFactory().getInboundEvent[eventName](rawEvent);
+        return this.eventFactory.getInboundEvent[eventName](rawEvent);
     }
 }
