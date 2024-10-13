@@ -3,7 +3,6 @@ import { PolicyInboxEntity } from "../infrastructure/consuming/PolicyInboxEntity
 import { PolicyPositionEntity } from "../infrastructure/consuming/PolicyPositionEntity";
 import { PolicyRepository } from "../infrastructure/consuming/PolicyRepository";
 import { InboundEvent } from "./InboundEvent";
-import { InboundEventFactory } from "../infrastructure/consuming/InboundEventFactory";
 
 export type ProcessMethods = {
     [key: string]: (inboundEvent: InboundEvent<any>) => Promise<void>;
@@ -27,7 +26,7 @@ export abstract class Policy {
      * 
      * @param repository - Policy's repository
      */
-    constructor(readonly repository: PolicyRepository<PolicyInboxEntity, PolicyPositionEntity, InboundEventFactory>) {
+    constructor(readonly repository: PolicyRepository<PolicyInboxEntity, PolicyPositionEntity>) {
     }
 
     /**

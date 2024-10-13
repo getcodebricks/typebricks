@@ -4,7 +4,6 @@ import { InboundEvent } from "./InboundEvent";
 import { IProjectionRepositoryMethods, ProjectionRepository } from "../infrastructure/consuming/ProjectionRepository";
 import { ProjectionInboxEntity } from "../infrastructure/consuming/ProjectionInboxEntity";
 import { ProjectionPositionEntity } from "../infrastructure/consuming/ProjectionPositionEntity";
-import { InboundEventFactory } from "../infrastructure/consuming/InboundEventFactory";
 
 export type ProjectMethods = {
     [key: string]: (eventMessage: InboundEvent<any>, methods: IProjectionRepositoryMethods) => Promise<void>;
@@ -29,7 +28,7 @@ export abstract class Projector {
      * 
      * @param repository - Projector's repository
      */
-    constructor(readonly repository: ProjectionRepository<ProjectionInboxEntity, ProjectionPositionEntity, BaseEntity, InboundEventFactory, IProjectionRepositoryMethods>) {
+    constructor(readonly repository: ProjectionRepository<ProjectionInboxEntity, ProjectionPositionEntity, BaseEntity, IProjectionRepositoryMethods>) {
     }
 
     /**
