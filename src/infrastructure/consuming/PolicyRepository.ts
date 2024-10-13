@@ -80,8 +80,14 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
                 throw new NoInboxEventFoundError(`No inbox event found for no ${lastProcessedNo + 1} of ${useCaseName} and stream ${streamName}`);
             }
             const inboundEvent: InboundEvent<any> | null = await this.parseRawInboxEvent(inboxEvent);
-            if(inboundEvent){
-                await processMethod(inboundEvent);
+            if (inboundEvent) {
+                try {
+                    await processMethod(inboundEvent);
+                } catch (error: any) {
+                    if (!(error instanceof TypeError)) {
+                        throw error;
+                    }
+                }
             }
             await this.updatePolicyPosition(useCaseName, streamName, inboxEvent.no);
             await this.queryRunner.commitTransaction();

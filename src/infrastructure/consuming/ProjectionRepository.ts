@@ -91,16 +91,22 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
                 }
                 const inboundEvent: InboundEvent<any> | null = await this.parseRawInboxEvent(inboxEvent);
                 if (inboundEvent) {
-                    await projectMethod(
-                        inboundEvent,
-                        {
-                            getOne: (findOneOptions: FindOneOptions) => this.getOne(transactionalEntityManager, findOneOptions),
-                            getMany: (findManyOptions: FindManyOptions) => this.getMany(transactionalEntityManager, findManyOptions),
-                            updateOne: (projectedEntity: TProjectedEntity) => this.updateOne(transactionalEntityManager, projectedEntity),
-                            updateMany: (projectedEntities: TProjectedEntity[]) => this.updateMany(transactionalEntityManager, projectedEntities),
-                            delete: (findManyOptions: FindManyOptions) => this.delete(transactionalEntityManager, findManyOptions)
-                        } as TProjectionRepositoryMethods
-                    );
+                    try {
+                        await projectMethod(
+                            inboundEvent,
+                            {
+                                getOne: (findOneOptions: FindOneOptions) => this.getOne(transactionalEntityManager, findOneOptions),
+                                getMany: (findManyOptions: FindManyOptions) => this.getMany(transactionalEntityManager, findManyOptions),
+                                updateOne: (projectedEntity: TProjectedEntity) => this.updateOne(transactionalEntityManager, projectedEntity),
+                                updateMany: (projectedEntities: TProjectedEntity[]) => this.updateMany(transactionalEntityManager, projectedEntities),
+                                delete: (findManyOptions: FindManyOptions) => this.delete(transactionalEntityManager, findManyOptions)
+                            } as TProjectionRepositoryMethods
+                        );
+                    } catch (error: any) {
+                        if (!(error instanceof TypeError)) {
+                            throw error;
+                        }
+                    }
                 }
                 await this.updateProjectionPosition(transactionalEntityManager, projectionName, streamName, inboxEvent.no);
                 await this.deleteInboxEntriesUntil(transactionalEntityManager, projectionName, streamName, lastProjectedNo);
