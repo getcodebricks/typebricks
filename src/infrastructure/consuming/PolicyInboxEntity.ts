@@ -31,7 +31,7 @@ export abstract class PolicyInboxEntity {
     @Column({ name: 'stream_name' })
     streamName: string;
 
-    @Column({ name: 'message', type: 'jsonb'})
+    @Column({ name: 'message', type: 'text'})
     message: string;
 
     constructor(props?: IPolicyInboxEntity) {
