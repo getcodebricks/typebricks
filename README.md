@@ -1,6 +1,6 @@
 # Type Bricks
 
-### [Type Bricks](https://getcodebricks.com)  is the fastest way to build microservices in Type Script.
+### [Type Bricks](https://codebricks.tech)  is the fastest way to build microservices in Type Script.
 Domain Driven Design (DDD), Command-Query Responsibility Separation (CQRS) and Event Sourcing.
 
 ## Features
@@ -11,8 +11,8 @@ Domain Driven Design (DDD), Command-Query Responsibility Separation (CQRS) and E
 - **Support of AWS Lambda, API Gateway, Event Bridge, SQS, RDS and CloudWatch** delivers scalability and cost savings
 
 ## Documentation
-You can find the Type Bricks documentation [on the website](https://getcodebricks.com).   
-Check out the [Getting Started](https://getcodebricks.com/docs/category/getting-started) page for a quick overview.
+You can find the Type Bricks documentation [on the website](https://codebricks.tech).   
+Check out the [Getting Started](https://codebricks.tech/docs/category/getting-started) page for a quick overview.
 
 ## License
 Type Bricks is [MIT licensed](https://github.com/getcodebricks/typebricks/blob/main/LICENSE).

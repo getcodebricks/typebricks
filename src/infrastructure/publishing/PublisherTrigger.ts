@@ -5,7 +5,7 @@ import { SQSClient, SendMessageCommand, SendMessageCommandInput } from "@aws-sdk
  * 
  * * Demos: 
  * 
- * - [Publishing](https://getcodebricks.com/docs/publishing)
+ * - [Publishing](https://codebricks.tech/docs/code/techniques/publishing)
  * 
  */
 export class PublisherTrigger {

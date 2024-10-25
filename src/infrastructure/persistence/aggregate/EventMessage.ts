@@ -17,8 +17,8 @@ export interface IEventMessage {
  * 
  * Demos: 
  * 
- * - [Publishing](https://getcodebricks.com/docs/publishing)
- * - [Consuming](https://getcodebricks.com/docs/consuming)
+ * - [Publishing](https://codebricks.tech/docs/code/techniques/publishing)
+ * - [Consuming](https://codebricks.tech/docs/code/techniques/consuming)
  * 
  */
 export class EventMessage {

@@ -14,7 +14,7 @@ import { parseToDateTime } from "../../../utils/parseToDateTime";
  * 
  * Demos: 
  * 
- * - [Publishing](https://getcodebricks.com/docs/publishing)
+ * - [Publishing](https://codebricks.tech/docs/code/techniques/publishing)
  * 
  */
 export abstract class AbstractAggregateRepository<TAggregate extends Aggregate<any>, TEventStreamEntity extends EventStreamEntity, TOutBoxEntity extends OutboxEntity, TAggregateStateEntity extends AbstractAggregateStateEntity, TEventFactory extends EventFactory> {

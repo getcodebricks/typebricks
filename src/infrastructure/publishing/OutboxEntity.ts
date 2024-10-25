@@ -12,7 +12,7 @@ export interface IOutboxEntity {
  * 
  * * Demos: 
  * 
- * - [Publishing](https://getcodebricks.com/docs/publishing)
+ * - [Publishing](https://codebricks.tech/docs/code/techniques/publishing)
  * 
  */
 @Entity()

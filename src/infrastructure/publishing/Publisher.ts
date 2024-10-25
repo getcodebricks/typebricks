@@ -8,7 +8,7 @@ import { EventMessage } from "../persistence/aggregate/EventMessage";
  * 
  * * Demos: 
  * 
- * - [Publishing](https://getcodebricks.com/docs/publishing)
+ * - [Publishing](https://codebricks.tech/docs/code/techniques/publishing)
  * 
  */
 export class Publisher<T extends OutboxEntity> {

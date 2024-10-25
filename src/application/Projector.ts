@@ -15,7 +15,7 @@ export type ProjectMethods = {
  * 
  * Demos: 
  * 
- * - [Consuming](https://getcodebricks.com/docs/consuming)
+ * - [Consuming](https://codebricks.tech/docs/code/techniques/consuming)
  * 
  */
 export abstract class Projector {

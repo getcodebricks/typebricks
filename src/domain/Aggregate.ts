@@ -5,11 +5,11 @@ import { Event } from './Event';
  * 
  * Demos: 
  * 
- * - [Command API](https://getcodebricks.com/docs/fundamentals/command-api)
+ * - [Command API](https://codebricks.tech/docs/code/fundamentals/command-api/)
  * 
  * API: 
  * 
- * - [Aggregate](https://getcodebricks.com/docs/api/aggregate) 
+ * - [Aggregate](https://codebricks.tech/docs/code/fundamentals/command-api/aggregate) 
  * 
  */
 export abstract class Aggregate<TState> {

@@ -13,7 +13,7 @@ export interface IProjectionPositionEntity {
  * 
  * * Demos: 
  * 
- * - [Consuming](https://getcodebricks.com/docs/consuming)
+ * - [Consuming](https://codebricks.tech/docs/code/techniques/consuming)
  * 
  */
 @Entity()

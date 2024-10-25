@@ -7,7 +7,7 @@ import { toSnakeCase } from "../../utils/toSnakeCase";
  * 
  * Demos: 
  * 
- * - [Receating](https://getcodebricks.com/docs/replaying)
+ * - [Receating](https://codebricks.tech/docs/code/techniques/event-replaying)
  * 
  */
 class PolicyReplayor {

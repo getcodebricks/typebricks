@@ -7,7 +7,7 @@ export interface QueryProps {
  * 
  * Demos: 
  * 
- * - [Query](https://getcodebricks.com/docs/fundamentals/query-api)
+ * - [Query](https://codebricks.tech/docs/code/fundamentals/query-api/query)
  * 
  */
 export abstract class Query<T extends QueryProps> {

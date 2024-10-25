@@ -11,7 +11,7 @@ import { InboundEventFactory } from "./InboundEventFactory";
  * 
  * Demos: 
  * 
- * - [Consuming](https://getcodebricks.com/docs/consuming)
+ * - [Consuming](https://codebricks.tech/docs/code/techniques/consuming)
  * 
  */
 export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, TPositionEntity extends PolicyPositionEntity> {

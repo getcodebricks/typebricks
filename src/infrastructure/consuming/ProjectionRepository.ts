@@ -19,7 +19,7 @@ export interface IProjectionRepositoryMethods {
  * 
  * Demos: 
  * 
- * - [Consuming](https://getcodebricks.com/docs/consuming)
+ * - [Consuming](https://codebricks.tech/docs/code/techniques/consuming)
  * 
  */
 export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxEntity, TPositionEntity extends ProjectionPositionEntity, TProjectedEntity extends BaseEntity, TProjectionRepositoryMethods extends IProjectionRepositoryMethods> {
