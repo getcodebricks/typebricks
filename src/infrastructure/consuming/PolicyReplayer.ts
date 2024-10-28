@@ -10,10 +10,10 @@ import { toSnakeCase } from "../../utils/toSnakeCase";
  * - [Receating](https://codebricks.tech/docs/code/techniques/event-replaying)
  * 
  */
-class PolicyReplayor {
+class PolicyReplayer {
     
     /**
-     * Initializes PolicyReplayor
+     * Initializes PolicyReplayer
      * 
      * @param policy - Policy's policy
      */
@@ -70,4 +70,4 @@ class PolicyReplayor {
     }
 }
 
-export { PolicyReplayor };
+export { PolicyReplayer };
