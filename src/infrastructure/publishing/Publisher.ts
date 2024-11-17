@@ -95,8 +95,8 @@ export class Publisher<T extends OutboxEntity> {
 
             await Promise.all(outboxEvents.map(async (outboxEvent: T) => {
                 const inboxEventMessage: EventMessage = new EventMessage(JSON.parse(outboxEvent.message));
-                const eventMessage: EventMessage = inboxEventMessage;
-                if (!await this.sendEvent(eventMessage.name, JSON.stringify(eventMessage))) {
+                const compressedMessage: EventMessage = await inboxEventMessage.compressPayload();
+                if (!await this.sendEvent(compressedMessage.name, JSON.stringify(compressedMessage))) {
                     throw new Error('failed to publish event message');
                 }
             }));
