@@ -1,6 +1,6 @@
 {
     "name": "@codebricks/typebricks",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "description": "Type Bricks is the fastest way to build microservices in Type Script using Domain Driven Design (DDD), Command-Query Responsibility Separation (CQRS) and Event Sourcing.",
     "repository": {
         "type": "git",
