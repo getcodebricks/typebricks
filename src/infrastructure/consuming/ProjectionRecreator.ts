@@ -11,7 +11,7 @@ import { toSnakeCase } from "../../utils/toSnakeCase";
  * 
  */
 class ProjectionRecreator {
-    
+
     /**
      * Initializes ProjectionRecreator
      * 
@@ -49,21 +49,25 @@ class ProjectionRecreator {
         var offset: number = 0;
         var continueFetching: boolean = true;
         while (continueFetching) {
-            const eventResult = await this.projector.repository.datasource.query(`SELECT * FROM ${eventStreamName} LIMIT 1 OFFSET ${offset};`);
+            const eventResult = await this.projector.repository.datasource.query(`SELECT * FROM ${eventStreamName} WHERE no IS NOT NULL ORDER BY no LIMIT 1 OFFSET ${offset};`);
             if (eventResult.length === 0) {
                 continueFetching = false;
             } else {
                 const event = eventResult[0];
-                await this.projector.acceptIntoInbox(new EventMessage({
-                    streamName: streamName,
-                    no: event.no,
-                    id: event.id,
-                    name: event.name,
-                    aggregateId: event.aggregate_id,
-                    aggregateVersion: event.aggregate_version,
-                    occurredAt: event.occurred_at,
-                    payload: event.payload,
-                }));
+                await this.projector.acceptIntoInbox(
+                    [
+                        new EventMessage({
+                            streamName: streamName,
+                            no: event.no,
+                            id: event.id,
+                            name: event.name,
+                            aggregateId: event.aggregate_id,
+                            aggregateVersion: event.aggregate_version,
+                            occurredAt: event.occurred_at,
+                            payload: event.payload,
+                        })
+                    ]
+                );
                 offset++;
             }
         }

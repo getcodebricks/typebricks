@@ -23,11 +23,11 @@ export abstract class Projector {
     abstract projectMethods: ProjectMethods;
     abstract streamNames: string[];
 
-     /**
-     * Initializes Projector
-     * 
-     * @param repository - Projector's repository
-     */
+    /**
+    * Initializes Projector
+    * 
+    * @param repository - Projector's repository
+    */
     constructor(readonly repository: ProjectionRepository<ProjectionInboxEntity, ProjectionPositionEntity, BaseEntity, IProjectionRepositoryMethods>) {
     }
 
@@ -37,13 +37,20 @@ export abstract class Projector {
      * @param eventMessage
      * @returns 
      */
-    async acceptIntoInbox(eventMessage: EventMessage): Promise<void> {
-        const inboxEventMessage: EventMessage = eventMessage.compressed ? await eventMessage.uncompressPayload() : eventMessage;
+    async acceptIntoInbox(eventMessages: EventMessage[]): Promise<void> {
         await this.repository.insertIntoInbox(
-            inboxEventMessage.no!,
-            this.projectionName,
-            inboxEventMessage.streamName,
-            JSON.stringify(inboxEventMessage)
+            await Promise.all(
+                eventMessages.map(async (eventMessage: EventMessage) => (
+                    {
+                        id: eventMessage.id!,
+                        no: eventMessage.no!,
+                        projectionName: this.projectionName,
+                        streamName: eventMessage.streamName,
+                        message: JSON.stringify(eventMessage.compressed ? await eventMessage.uncompressPayload() : eventMessage)
+                    }
+                )
+                )
+            ),
         );
     }
 
