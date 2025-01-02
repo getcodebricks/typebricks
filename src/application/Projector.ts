@@ -48,8 +48,7 @@ export abstract class Projector {
                         streamName: eventMessage.streamName,
                         message: JSON.stringify(eventMessage.compressed ? await eventMessage.uncompressPayload() : eventMessage)
                     }
-                )
-                )
+                ))
             ),
         );
     }

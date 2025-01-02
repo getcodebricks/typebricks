@@ -48,9 +48,12 @@ export abstract class ProjectionRepository<TInboxEntity extends ProjectionInboxE
      * @param events - Event to insert into Inbox
      * @returns  
      */
-    async insertIntoInbox(events: TInboxEntity[]): Promise<void> {
+    async insertIntoInbox(events: IProjectionInboxEntity[]): Promise<void> {
         try {
-            await this.datasource.manager.save(events, { chunk: 10 });
+            await this.datasource.manager.save(
+                events.map((event: IProjectionInboxEntity) => new this.inboxEntity(event)),
+                { chunk: 10 }
+            );
         } catch (error: any) {
             if (error?.code == 23505) {
                 return;
