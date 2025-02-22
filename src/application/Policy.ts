@@ -35,13 +35,19 @@ export abstract class Policy {
      * @param eventMessage
      * @returns 
      */
-    async acceptIntoInbox(eventMessage: EventMessage): Promise<void> {
-        const inboxEventMessage: EventMessage = eventMessage.compressed ? await eventMessage.uncompressPayload() : eventMessage;
+    async acceptIntoInbox(eventMessages: EventMessage[]): Promise<void> {
         await this.repository.insertIntoInbox(
-            inboxEventMessage.no!,
-            this.useCaseName,
-            inboxEventMessage.streamName,
-            JSON.stringify(inboxEventMessage)
+            await Promise.all(
+                eventMessages.map(async (eventMessage: EventMessage) => (
+                    {
+                        id: eventMessage.id!,
+                        no: eventMessage.no!,
+                        useCaseName: this.useCaseName,
+                        streamName: eventMessage.streamName,
+                        message: JSON.stringify(eventMessage.compressed ? await eventMessage.uncompressPayload() : eventMessage)
+                    }
+                ))
+            ),
         );
     }
 

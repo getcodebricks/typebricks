@@ -33,23 +33,17 @@ export abstract class PolicyRepository<TInboxEntity extends PolicyInboxEntity, T
     }
 
     /**
-     * Inserts event into Policy's inbox.
+     * Inserts events into Policy's inbox.
      * 
-     * @param no - Event no
-     * @param useCaseName - Policy name
-     * @param streamName - Consumed stream name
-     * @param message - Event message
-     * @returns 
+     * @param events - Event to insert into Inbox
+     * @returns  
      */
-    async insertIntoInbox(no: number, useCaseName: string, streamName: string, message: string): Promise<void> {
+    async insertIntoInbox(events: IPolicyInboxEntity[]): Promise<void> {
         try {
-            const projectionInboxEntity: TInboxEntity = new this.inboxEntity({
-                no: no,
-                useCaseName: useCaseName,
-                streamName: streamName,
-                message: message
-            });
-            await this.queryRunner.manager.save(projectionInboxEntity);
+            await this.queryRunner.manager.save(
+                events.map((event: IPolicyInboxEntity) => new this.inboxEntity(event)),
+                { chunk: 10 }
+            );
         } catch (error: any) {
             if (error?.code == 23505) {
                 return;
