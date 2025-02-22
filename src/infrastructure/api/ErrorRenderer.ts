@@ -4,7 +4,7 @@ import { PreconditionFailedError } from "../../domain/errors/PreconditionFailedE
 import { ValidationError } from "../../domain/errors/ValidationError";
 import { ApiResponse, defaultCORSHeaders } from "./ApiResponse";
 
-export function renderError(error: any, headers: any = null): ApiResponse<any> {
+export function renderErrorResponse(error: any, headers: any = null): ApiResponse<any> {
     if (error instanceof ValidationError) {
         return {
             statusCode: 400,
