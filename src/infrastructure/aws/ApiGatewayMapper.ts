@@ -6,6 +6,10 @@ export function requestFromAPIGatewayEvent(event: APIGatewayProxyEvent): any {
     return JSON.parse(event.body ? event.body : '{}', parseToDateTime);
 }
 
+export function authorizedUserIdFromAPIGatewayEvent(event: APIGatewayProxyEvent): string {
+    return event.requestContext.authorizer?.principalId ?? '';
+}
+
 export function responseToAPIGateWayResult(response: ApiResponse<any>): APIGatewayProxyResult {
     return {
         statusCode: response.statusCode,
